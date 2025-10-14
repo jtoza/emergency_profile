@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ profile.full_name }} - Emergency Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #ef233c;
+            --text-light: #e9ecef;
+            --text-muted: #adb5bd;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .profile-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border-radius: 24px;
+            padding: 48px;
+            max-width: 1000px;
+            width: 95%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.36);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 40px;
+            animation: fadeInUp 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 70%);
+            z-index: -1;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-header {
+            grid-column: span 2;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .profile-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+
+        .profile-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #fff, #f8f9fa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .profile-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .access-badge {
+            background: linear-gradient(135deg, var(--danger), #d90429);
+            padding: 8px 24px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            margin-top: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(239, 35, 60, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .access-badge i {
+            margin-right: 8px;
+            font-size: 0.9em;
+        }
+
+        .profile-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            row-gap: 16px;
+            column-gap: 24px;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+        }
+
+        .info-label i {
+            margin-right: 10px;
+            font-size: 0.9em;
+            width: 18px;
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .info-value {
+            font-weight: 400;
+            color: var(--text-light);
+            position: relative;
+            padding-left: 8px;
+        }
+
+        .info-value::before {
+            content: ':';
+            position: absolute;
+            left: -5px;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin: 40px 0 20px 0;
+            color: #fff;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+
+        .medical-section .info-label {
+            color: #4cc9f0;
+        }
+
+        .medical-section .info-value {
+            color: #caf0f8;
+        }
+
+        .qr-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .qr-container {
+            background: #fff;
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qr-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .qr-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+        }
+
+        .qr-container img {
+            width: 200px;
+            height: 200px;
+            display: block;
+        }
+
+        .qr-note {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            text-align: center;
+            max-width: 240px;
+            margin-top: 16px;
+            line-height: 1.5;
+        }
+
+        .footer-note {
+            grid-column: span 2;
+            text-align: center;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.4);
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        @media (max-width: 900px) {
+            .profile-card {
+                grid-template-columns: 1fr;
+                padding: 30px;
+            }
+
+            .profile-header {
+                grid-column: span 1;
+            }
+
+            .profile-info {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-title {
+                font-size: 2.2rem;
+            }
+
+            .qr-section {
+                margin-top: 40px;
+                padding-top: 40px;
+                border-top: 1px solid rgba(255,255,255,0.1);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-card {
+                padding: 24px;
+                border-radius: 16px;
+            }
+
+            .profile-title {
+                font-size: 1.8rem;
+            }
+
+            .section-title {
+                font-size: 1.3rem;
+                margin: 30px 0 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-card">
+        <div class="profile-header">
+            <h1 class="profile-title">{{ profile.full_name }}</h1>
+            <p class="profile-subtitle">Emergency Medical Profile</p>
+            <span class="access-badge"><i class="fas fa-exclamation-circle"></i> Emergency Access</span>
+        </div>
+
+        <div>
+            <h2 class="section-title">Personal Information</h2>
+            <div class="profile-info">
+                <span class="info-label"><i class="fas fa-user"></i>Full Name</span>
+                <span class="info-value">{{ profile.full_name }}</span>
+
+                <span class="info-label"><i class="fas fa-id-card"></i>National ID</span>
+                <span class="info-value">{{ profile.national_id }}</span>
+
+                <span class="info-label"><i class="fas fa-globe"></i>Country</span>
+                <span class="info-value">{{ profile.country }}</span>
+
+                <span class="info-label"><i class="fas fa-venus-mars"></i>Gender</span>
+                <span class="info-value">{{ profile.get_gender_display }}</span>
+
+                <span class="info-label"><i class="fas fa-phone-alt"></i>Emergency Contact</span>
+                <span class="info-value">{{ profile.emergency_contact }}</span>
+            </div>
+
+            <h2 class="section-title">Medical Information</h2>
+            <div class="medical-section">
+                <div class="profile-info">
+                    <span class="info-label"><i class="fas fa-tint"></i>Blood Type</span>
+                    <span class="info-value">{{ profile.blood_type }}</span>
+
+                    <span class="info-label"><i class="fas fa-allergies"></i>Allergies</span>
+                    <span class="info-value">{{ profile.allergies|default:"None" }}</span>
+
+                    <span class="info-label"><i class="fas fa-heartbeat"></i>Conditions</span>
+                    <span class="info-value">{{ profile.medical_conditions|default:"None" }}</span>
+
+                    <span class="info-label"><i class="fas fa-pills"></i>Medications</span>
+                    <span class="info-value">{{ profile.medications|default:"None" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="qr-section">
+            <div class="qr-container">
+                <img src="{{ profile.qr_code.url }}" alt="QR Code">
+            </div>
+            <p class="qr-note">Scan this QR code with any smartphone to access emergency medical information</p>
+        </div>
+
+        <div class="footer-note">
+            Last updated: {{ profile.updated_at|date:"M d, Y" }} | For emergency use only
+        </div>
+    </div>
+</body>
+</html>

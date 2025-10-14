@@ -1,0 +1,257 @@
+{% extends 'medical/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mt-4">Medical Profiles Analytics</h1>
+    
+    <!-- Summary Cards -->
+    <div class="row mt-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Profiles</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_profiles }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Recent Registrations (7d)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ recent_profiles }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-plus fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total QR Scans</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_scans }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-qrcode fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scan Types Chart -->
+    <div class="row">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Scan Types Breakdown</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-bar">
+                        <canvas id="scanTypesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blood Type Distribution -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Blood Type Distribution</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="bloodTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Most Scanned Profiles -->
+    <div class="row mt-4">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Most Scanned Profiles</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>National ID</th>
+                                    <th>Total Scans</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for profile in most_scanned %}
+                                <tr>
+                                    <td>{{ profile.full_name }}</td>
+                                    <td>{{ profile.national_id }}</td>
+                                    <td>{{ profile.scan_count }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No scan data available</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Scans -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Scans</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Profile</th>
+                                    <th>Type</th>
+                                    <th>Scanned At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for scan in recent_scans %}
+                                <tr>
+                                    <td>{{ scan.profile.full_name }}</td>
+                                    <td>{{ scan.get_access_type_display }}</td>
+                                    <td>{{ scan.scanned_at|date:"Y-m-d H:i" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No recent scans</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Safe data extraction
+function safeJsonParse(jsonString) {
+    try {
+        return JSON.parse(jsonString);
+    } catch (e) {
+        console.error('Error parsing JSON:', e);
+        return [];
+    }
+}
+
+// Initialize charts when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Scan Types Chart
+    const scanTypesCtx = document.getElementById('scanTypesChart');
+    if (scanTypesCtx) {
+        const scanLabels = safeJsonParse('{{ scan_types_labels|escapejs }}');
+        const scanData = safeJsonParse('{{ scan_types_counts|escapejs }}');
+        
+        new Chart(scanTypesCtx, {
+            type: 'bar',
+            data: {
+                labels: scanLabels,
+                datasets: [{
+                    label: 'Number of Scans',
+                    data: scanData,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(75, 192, 192, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { 
+                    y: { 
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Blood Type Chart
+    const bloodTypeCtx = document.getElementById('bloodTypeChart');
+    if (bloodTypeCtx) {
+        const bloodLabels = safeJsonParse('{{ blood_types_labels|escapejs }}');
+        const bloodData = safeJsonParse('{{ blood_types_counts|escapejs }}');
+        
+        new Chart(bloodTypeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: bloodLabels,
+                datasets: [{
+                    data: bloodData,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)',
+                        'rgba(255, 159, 64, 0.7)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

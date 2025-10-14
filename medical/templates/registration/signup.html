@@ -1,0 +1,28 @@
+{% extends 'medical/base.html' %}
+{% load widget_tweaks %}
+{% block title %}Sign Up | MediTrack{% endblock %}
+{% block content %}
+<div style="max-width:520px;margin:2rem auto;background:#fff;border-radius:12px;box-shadow:var(--box-shadow);padding:2rem;">
+  <h2 style="font-family:'Playfair Display',serif;margin-bottom:1rem;">Create your account</h2>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div style="display:grid;gap:1rem;">
+      <div>
+        <label>Username</label>
+        {{ form.username|add_class:'form-control' }}
+      </div>
+      <div>
+        <label>Password</label>
+        {{ form.password1|add_class:'form-control' }}
+      </div>
+      <div>
+        <label>Confirm Password</label>
+        {{ form.password2|add_class:'form-control' }}
+      </div>
+      <button class="btn btn-primary" type="submit" style="width:100%;">Create account</button>
+    </div>
+  </form>
+  <p style="margin-top:1rem;color:var(--muted);">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+</div>
+{% endblock %}

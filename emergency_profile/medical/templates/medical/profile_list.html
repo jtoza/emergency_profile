@@ -1,0 +1,315 @@
+{% extends 'medical/base.html' %}
+
+{% block title %}Medical Profiles | MediTrack{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        padding: 4rem 0;
+        margin-bottom: 3rem;
+        border-radius: var(--border-radius);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+        transform: rotate(30deg);
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+    
+    .hero h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hero p {
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto 2rem;
+        opacity: 0.9;
+    }
+    
+    .search-bar {
+        max-width: 600px;
+        margin: 0 auto;
+        position: relative;
+    }
+    
+    .search-bar input {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        border-radius: 50px;
+        border: none;
+        font-size: 1rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .search-bar button {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        background: var(--primary-dark);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 0.7rem 1.5rem;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .search-bar button:hover {
+        background: var(--dark);
+    }
+    
+    .profiles-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .profiles-header h2 {
+        font-family: 'Playfair Display', serif;
+        color: var(--dark);
+    }
+    
+    .profile-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .profile-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+    
+    .profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .profile-card-header {
+        background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%);
+        color: white;
+        padding: 1.5rem;
+        position: relative;
+    }
+    
+    .profile-card-header h3 {
+        margin: 0;
+        font-size: 1.3rem;
+    }
+    
+    .profile-card-body {
+        padding: 1.5rem;
+    }
+    
+    .profile-info-item {
+        display: flex;
+        margin-bottom: 0.8rem;
+    }
+    
+    .profile-info-item i {
+        width: 30px;
+        color: var(--primary);
+    }
+    
+    .profile-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .profile-actions a {
+        flex: 1;
+        text-align: center;
+        padding: 0.5rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    
+    .view-btn {
+        background: var(--primary);
+        color: white;
+    }
+    
+    .view-btn:hover {
+        background: var(--primary-dark);
+    }
+    
+    .edit-btn {
+        background: var(--light);
+        color: var(--dark);
+        border: 1px solid #ddd;
+    }
+    
+    .edit-btn:hover {
+        background: #e9ecef;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .pagination a, .pagination span {
+        padding: 0.5rem 1rem;
+        margin: 0 0.25rem;
+        border-radius: 6px;
+        text-decoration: none;
+    }
+    
+    .pagination a {
+        background: white;
+        color: var(--primary);
+        border: 1px solid #ddd;
+    }
+    
+    .pagination a:hover {
+        background: var(--primary);
+        color: white;
+    }
+    
+    .pagination .current {
+        background: var(--primary);
+        color: white;
+        font-weight: bold;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 0;
+        color: var(--muted);
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #ddd;
+    }
+    
+    @media (max-width: 768px) {
+        .hero h1 {
+            font-size: 2rem;
+        }
+        
+        .hero p {
+            font-size: 1rem;
+        }
+        
+        .profiles-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Medical Profiles Management</h1>
+        <p>Access and manage patient medical information securely and efficiently.</p>
+        <div class="search-bar">
+            <form method="get" action="{% url 'profile_list' %}">
+                <input type="text" name="q" placeholder="Search by name or national ID..." value="{{ request.GET.q }}">
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<div class="profiles-header">
+    <h2>Patient Profiles</h2>
+    <a href="{% url 'profile_create' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add New Profile
+    </a>
+</div>
+
+{% if object_list %}
+<div class="profile-cards">
+    {% for profile in object_list %}
+    <div class="profile-card">
+        <div class="profile-card-header">
+            <h3>{{ profile.full_name }}</h3>
+        </div>
+        <div class="profile-card-body">
+            <div class="profile-info-item">
+                <i class="fas fa-id-card"></i>
+                <span>{{ profile.national_id }}</span>
+            </div>
+            <div class="profile-info-item">
+                <i class="fas fa-globe"></i>
+                <span>{{ profile.country }}</span>
+            </div>
+            <div class="profile-info-item">
+                <i class="fas fa-venus-mars"></i>
+                <span>{{ profile.get_gender_display }}</span>
+            </div>
+            <div class="profile-info-item">
+                <i class="fas fa-tint"></i>
+                <span>{{ profile.blood_type|default:"Not specified" }}</span>
+            </div>
+            <div class="profile-actions">
+                <a href="{% url 'profile_detail' profile.national_id %}" class="view-btn">
+                    <i class="fas fa-eye"></i> View
+                </a>
+                <a href="{% url 'profile_update' profile.national_id %}" class="edit-btn">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; First</a>
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+
+    <span class="current">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+    {% endif %}
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-user-injured"></i>
+    <h3>No profiles found</h3>
+    <p>Start by creating a new medical profile</p>
+    <a href="{% url 'profile_create' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Create Profile
+    </a>
+</div>
+{% endif %}
+{% endblock %}

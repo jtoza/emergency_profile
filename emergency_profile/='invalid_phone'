@@ -1,0 +1,47 @@
+from django import forms
+from medical.models import MedicalProfile
+from django.core.validators import RegexValidator
+
+class MedicalProfileForm(forms.ModelForm):
+    national_id = forms.CharField(
+        validators=[
+            RegexValidator(
+                regex=r'^[A-Za-z0-9\-]+$',
+                message='National ID can only contain letters, numbers, and hyphens',
+                code='invalid_national_id'
+            )
+        ]
+    )
+    
+    emergency_phone = forms.CharField(
+        required=False,
+        validators=[
+            RegexValidator(
+                regex=r'^\+?[0-9\s\-]+$',
+                message='Phone number can only contain numbers, spaces, hyphens, and optional + prefix',
+                code='invalid_phone'
+            )
+        ]
+    )
+    
+    class Meta:
+        model = MedicalProfile
+        fields = '__all__'
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
+            'allergies': forms.Textarea(attrs={'rows': 3}),
+            'medical_conditions': forms.Textarea(attrs={'rows': 3}),
+            'medications': forms.Textarea(attrs={'rows': 3}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            if field not in ['allergies', 'medical_conditions', 'medications']:
+                self.fields[field].widget.attrs.update({'class': 'form-control'})
+            else:
+                self.fields[field].widget.attrs.update({'class': 'form-control textarea-field'})
+        
+        self.fields['gender'].widget.attrs.update({'class': 'form-select'})
+        self.fields['blood_type'].widget.attrs.update({'class': 'form-select'})
+        self.fields['country'].widget.attrs.update({'class': 'form-select'})

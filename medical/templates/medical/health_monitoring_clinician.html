@@ -1,0 +1,158 @@
+{% extends 'medical/base.html' %}
+{% block title %}Clinician — Health Monitoring | MediTrack{% endblock %}
+{% block extra_css %}
+<style>
+  .hero { background: linear-gradient(135deg, rgba(67,97,238,0.08), rgba(76,201,240,0.08)); border:1px solid rgba(67,97,238,0.1); border-radius:16px; padding:1.25rem; box-shadow: var(--box-shadow); margin-bottom: 1rem; }
+  .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; }
+  .card { background: #fff; border:1px solid rgba(67,97,238,0.08); border-radius:16px; box-shadow:var(--box-shadow); padding:1rem; }
+  .small { font-size: .9rem; color: var(--muted); }
+  .row-actions { display:flex; gap:.5rem; justify-content:flex-end; margin:.5rem 0 1rem; }
+  @media print { .navbar, footer, .messages, .row-actions { display:none !important; } .grid { grid-template-columns: 1fr !important; } .card { box-shadow: none; border: 1px solid #e5e7eb; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+  <h1>Health Monitoring — Clinician View</h1>
+  <p class="small">Patient: {{ profile.full_name }} ({{ profile.national_id }})</p>
+</div>
+<div class="row-actions">
+  <button class="btn btn-outline" id="btn-print"><i class="fa-solid fa-print"></i> Print</button>
+  <button class="btn btn-primary" id="btn-download"><i class="fa-solid fa-download"></i> Download Page</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h3><i class="fa-solid fa-pills"></i> Medication Schedule</h3>
+    <ul id="med-list"></ul>
+  </div>
+  <div class="card">
+    <h3><i class="fa-solid fa-heart-pulse"></i> Blood Pressure</h3>
+    <table id="bp-table" style="width:100%">
+      <thead><tr><th>Date</th><th>Sys/Dia</th><th>Pulse</th><th>Notes</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3><i class="fa-solid fa-glass-water"></i> Hydration</h3>
+    <p class="small">Daily goal: <span id="water-goal">--</span> ml</p>
+    <canvas id="water-chart" height="220"></canvas>
+  </div>
+  <div class="card">
+    <h3><i class="fa-solid fa-chart-line"></i> Blood Pressure Trend</h3>
+    <canvas id="bp-chart" height="220"></canvas>
+  </div>
+  <div class="card">
+    <h3><i class="fa-solid fa-person-walking"></i> Steps (Last 14 days)</h3>
+    <canvas id="steps-chart" height="220"></canvas>
+  </div>
+  <div class="card">
+    <h3><i class="fa-solid fa-heart-circle-bolt"></i> Heart Rate</h3>
+    <canvas id="hr-chart" height="220"></canvas>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function(){
+  const data = {{ health_json|safe }} || {};
+  const meds = data.meds || [];
+  const bp = (data.bp || []).slice().sort((a,b)=> new Date(a.time) - new Date(b.time));
+  const hr = (data.hr || []).slice().sort((a,b)=> new Date(a.time) - new Date(b.time));
+  const steps = (data.steps || []).slice().sort((a,b)=> new Date(a.date || a.time) - new Date(b.date || b.time));
+  const water = data.water || {};
+  const goal = (data.prefs && data.prefs.water_goal) ? data.prefs.water_goal : 2000;
+
+  // Render meds
+  const ml = document.getElementById('med-list');
+  if(ml){ ml.innerHTML = meds.map(m=> `<li>${m.time || '--:--'} • ${m.name || ''} ${m.dose||''} <span class="small">(${m.frequency||''}) ${m.notes? '— '+m.notes:''}</span></li>`).join(''); }
+
+  // Render BP table
+  const tbody = document.querySelector('#bp-table tbody');
+  if(tbody){ tbody.innerHTML = bp.map(r=> `<tr><td>${new Date(r.time||Date.now()).toLocaleString()}</td><td>${r.sys}/${r.dia}</td><td>${r.pulse||''}</td><td>${r.notes||''}</td></tr>`).join(''); }
+
+  // Charts
+  const bpCanvas = document.getElementById('bp-chart');
+  if(bpCanvas){
+    const labels = bp.map(r=> new Date(r.time).toLocaleString());
+    const sys = bp.map(r=> r.sys);
+    const dia = bp.map(r=> r.dia);
+    new Chart(bpCanvas.getContext('2d'), {
+      type: 'line',
+      data: { labels, datasets: [
+        { label: 'Systolic', data: sys, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.15)', tension: 0.35, fill:false, pointRadius:2 },
+        { label: 'Diastolic', data: dia, borderColor: '#60a5fa', backgroundColor: 'rgba(96,165,250,0.15)', tension: 0.35, fill:false, pointRadius:2 },
+      ] },
+      options: { responsive:true, plugins:{ legend:{display:true}}, scales: { x: {grid:{display:false}}, y: { suggestedMin:60, suggestedMax:180 } } }
+    });
+  }
+
+  const wc = document.getElementById('water-chart');
+  if(wc){
+    const labels = []; const totals = []; const goalLine = [];
+    const today = new Date();
+    for(let i=6;i>=0;i--){
+      const d = new Date(today); d.setDate(today.getDate()-i);
+      const key = d.toISOString().slice(0,10);
+      labels.push(d.toLocaleDateString(undefined, { weekday:'short' }));
+      const entries = water[key] || [];
+      totals.push(entries.reduce((a,b)=> a + (b.amount||0), 0));
+      goalLine.push(goal);
+    }
+    new Chart(wc.getContext('2d'), {
+      type:'bar', data: { labels, datasets:[
+        { label:'ml', data: totals, backgroundColor: 'rgba(67,97,238,0.25)', borderColor:'#4361ee', borderWidth:1, borderRadius:6 },
+        { label:'Goal', data: goalLine, type:'line', borderColor:'#10b981', pointRadius:0, borderDash:[6,4] }
+      ]}, options:{ responsive:true, plugins:{legend:{display:true}}, scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(2500, goal+500) } } }
+    });
+  }
+
+  // Steps chart (daily totals)
+  const stepsCanvas = document.getElementById('steps-chart');
+  if(stepsCanvas && steps.length){
+    const dayMap = new Map();
+    steps.forEach(s => { const key = (s.date || (s.time||'').slice(0,10)); const val = Number(s.value || s.steps || 0); dayMap.set(key, (dayMap.get(key)||0) + val); });
+    const keys = Array.from(dayMap.keys()).sort();
+    const labels = keys.map(k => new Date(k).toLocaleDateString(undefined, { month:'short', day:'numeric' }));
+    const values = keys.map(k => dayMap.get(k));
+    new Chart(stepsCanvas.getContext('2d'), {
+      type: 'bar', data: { labels, datasets: [ { label: 'Steps', data: values, backgroundColor: 'rgba(16,185,129,0.25)', borderColor:'#10b981', borderWidth:1, borderRadius:6 } ] },
+      options: { responsive:true, plugins:{ legend:{display:true} }, scales:{ y:{ beginAtZero:true } } }
+    });
+  }
+
+  // Heart rate chart
+  const hrCanvas = document.getElementById('hr-chart');
+  if(hrCanvas && hr.length){
+    const labels = hr.map(r => new Date(r.time).toLocaleTimeString());
+    const bpm = hr.map(r => Number(r.bpm || r.hr || r.value || 0));
+    new Chart(hrCanvas.getContext('2d'), {
+      type:'line', data:{ labels, datasets:[ { label:'BPM', data:bpm, borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.2)', tension:0.35, fill:false, pointRadius:2 } ] },
+      options:{ responsive:true, plugins:{ legend:{display:true} }, scales:{ y:{ beginAtZero:false, suggestedMin:40, suggestedMax:180 } } }
+    });
+  }
+
+  // Print / Download snapshot
+  const printBtn = document.getElementById('btn-print');
+  const downloadBtn = document.getElementById('btn-download');
+  if(printBtn){ printBtn.onclick = () => window.print(); }
+  if(downloadBtn){
+    downloadBtn.onclick = () => {
+      const hero = document.querySelector('.hero').cloneNode(true);
+      const grid = document.querySelector('.grid').cloneNode(true);
+      const bpc = grid.querySelector('#bp-chart');
+      const wtc = grid.querySelector('#water-chart');
+      if(bpc){ const img = new Image(); img.src = document.getElementById('bp-chart').toDataURL('image/png'); img.style.width='100%'; img.style.height='auto'; bpc.replaceWith(img); }
+      if(wtc){ const img2 = new Image(); img2.src = document.getElementById('water-chart').toDataURL('image/png'); img2.style.width='100%'; img2.style.height='auto'; wtc.replaceWith(img2); }
+      const css = `:root { --primary:#4361ee; --muted:#6c757d; --dark:#2b2d42; --box-shadow:0 10px 30px rgba(0,0,0,0.08);}*{box-sizing:border-box}body{font-family:'Poppins',sans-serif;background:#f9fafb;color:var(--dark);line-height:1.6;margin:0}.container{max-width:1200px;margin:0 auto;padding:20px}.hero{background:linear-gradient(135deg, rgba(67,97,238,0.08), rgba(76,201,240,0.08));border:1px solid rgba(67,97,238,0.1);border-radius:16px;padding:1.25rem;box-shadow:var(--box-shadow);margin-bottom:1rem}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem}.card{background:#fff;border:1px solid rgba(67,97,238,0.08);border-radius:16px;box-shadow:var(--box-shadow);padding:1rem}`;
+      const html = `<!DOCTYPE html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1' /><title>MediTrack — Health Monitoring (Clinician)</title><link href='https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap' rel='stylesheet'><style>${css}</style></head><body><div class='container'>${hero.outerHTML}${grid.outerHTML}</div></body></html>`;
+      const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `health_monitoring_{{ profile.national_id }}.html`; a.click();
+      setTimeout(()=> URL.revokeObjectURL(a.href), 1000);
+    }
+  }
+})();
+</script>
+{% endblock %}

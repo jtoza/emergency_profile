@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monitor Your Health | MediTrack</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --primary-dark: #3a0ca3;
+      --secondary: #3f37c9;
+      --accent: #4cc9f0;
+      --light: #f8f9fa;
+      --dark: #2b2d42;
+      --muted: #6c757d;
+      --success: #4ade80;
+      --danger: #f87171;
+      --warning: #fbbf24;
+      --info: #60a5fa;
+      --border-radius: 12px;
+      --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Poppins', sans-serif; background-color: #f9fafb; color: var(--dark); line-height: 1.6; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+    /* Standalone Landing Page Layout */
+    header.minimal {
+      padding: 1.25rem 0;
+      background: transparent;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      color: var(--primary-dark);
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      text-decoration: none;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 2.5rem;
+      align-items: center;
+      padding: 2rem 0 3rem;
+    }
+    .hero-card {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 2.5rem;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+    .hero p { color: #e9efff; margin-bottom: 1.5rem; }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn { display:inline-block; padding:.75rem 1.5rem; border-radius:var(--border-radius); font-weight:600; text-decoration:none; transition:var(--transition); cursor:pointer; border:none; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(67,97,238,.3); }
+    .btn-outline { background: transparent; color: #fff; border: 2px solid #fff; }
+    .btn-outline:hover { background: #fff; color: var(--primary-dark); transform: translateY(-2px); }
+
+    .hero-illus { background: linear-gradient(135deg, #edf2ff, #f5f3ff); border-radius: var(--border-radius); box-shadow: var(--box-shadow); padding: 2rem; }
+    .hero-stats { display:grid; grid-template-columns: repeat(3,1fr); gap:1rem; margin-top: 1.5rem; }
+    .stat { background: rgba(255,255,255,0.12); border-radius: 10px; padding: 1rem; text-align: center; }
+    .stat h3 { color: #fff; margin: 0; }
+    .stat small { color: #dbeafe; }
+
+    .section { margin-top: 3rem; }
+    .features { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:1.25rem; }
+    .feature { background:#fff; border-radius: var(--border-radius); padding: 1.25rem; box-shadow: var(--box-shadow); }
+    .feature i { color: var(--primary); margin-right: 8px; }
+    .cta { margin-top: 3rem; text-align: center; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding: 1.5rem 0; }
+      .hero-illus { order: 2; }
+      .hero-card { order: 1; }
+    }
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 2rem; }
+      .hero-card { padding: 1.5rem; }
+      .hero-actions { flex-direction: column; }
+      .hero-actions .btn { width: 100%; }
+      .hero-stats { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 400px) {
+      .hero h1 { font-size: 1.75rem; }
+      .hero-stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="minimal">
+    <div class="container">
+      <span class="brand"><i class="fas fa-heartbeat" style="color:var(--primary);"></i>MediTrack</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-card">
+        <h1>Monitor Your Health</h1>
+        <p>Track your vitals, medications, hydration, and lifestyle habits in one secure place. Share time-bound access with clinicians when needed.</p>
+        <div class="hero-actions">
+          <a href="{% url 'health_monitoring' %}" class="btn btn-primary"><i class="fa-solid fa-heart-pulse"></i> Start Monitoring</a>
+          {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="btn btn-outline"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+          {% else %}
+            <a href="{% url 'login' %}?next={% url 'health_monitoring' %}" class="btn btn-outline"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+            <a href="{% url 'signup' %}" class="btn btn-outline"><i class="fa-solid fa-user-plus"></i> Sign Up</a>
+          {% endif %}
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><h3>Secure</h3><small>Privacy-first data</small></div>
+          <div class="stat"><h3>Accessible</h3><small>Any device</small></div>
+          <div class="stat"><h3>Shareable</h3><small>Controlled access</small></div>
+        </div>
+      </div>
+      <div class="hero-illus">
+        <svg viewBox="0 0 400 300" width="100%" height="100%" style="display:block;border-radius:12px;">
+          <defs>
+            <linearGradient id="bg" x1="0" x2="1">
+              <stop stop-color="#edf2ff" />
+              <stop offset="1" stop-color="#f5f3ff" />
+            </linearGradient>
+            <linearGradient id="tube" x1="0" x2="1">
+              <stop stop-color="#4361ee" />
+              <stop offset="1" stop-color="#3a0ca3" />
+            </linearGradient>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#bg)" />
+          <!-- Simplified stethoscope -->
+          <circle cx="290" cy="110" r="35" fill="#ffffff" stroke="#3a0ca3" stroke-width="5" />
+          <circle cx="290" cy="110" r="20" fill="#edf2ff" stroke="#4361ee" stroke-width="4" />
+          <path d="M110 70 C80 90, 80 140, 110 160 C140 180, 170 160, 170 140" fill="none" stroke="url(#tube)" stroke-width="8" stroke-linecap="round" />
+          <path d="M170 140 C170 190, 220 210, 260 200" fill="none" stroke="#3a0ca3" stroke-width="6" stroke-linecap="round" />
+          <circle cx="110" cy="70" r="10" fill="#3a0ca3" />
+          <circle cx="170" cy="140" r="10" fill="#3a0ca3" />
+        </svg>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 style="font-family:'Playfair Display',serif; margin-bottom: 1rem;">Why MediTrack?</h2>
+      <div class="features">
+        <div class="feature"><h3><i class="fa-solid fa-lock"></i> Privacy Controls</h3><p>Choose what to share publicly, in emergencies, or with your doctor.</p></div>
+        <div class="feature"><h3><i class="fa-solid fa-bolt"></i> Quick Access</h3><p>QR codes for fast and secure profile access when seconds matter.</p></div>
+        <div class="feature"><h3><i class="fa-solid fa-chart-line"></i> Health Trends</h3><p>Visualize blood pressure, hydration, and habits over time.</p></div>
+        <div class="feature"><h3><i class="fa-solid fa-user-shield"></i> Account Security</h3><p>Log in to manage your profile and sync from your device.</p></div>
+      </div>
+      <div class="cta">
+        {% if user.is_authenticated %}
+          <a href="{% url 'health_monitoring' %}" class="btn btn-primary">Go to Health</a>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn btn-primary">Login to continue</a>
+          <p style="margin-top: .5rem; color: var(--muted);">No account? <a href="{% url 'signup' %}">Sign up</a></p>
+        {% endif %}
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,1 @@
+web: gunicorn emergency_profile.wsgi:application

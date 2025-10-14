@@ -1,0 +1,67 @@
+{% extends 'medical/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Network Configuration Test</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">Server Information</div>
+        <div class="card-body">
+            <p><strong>Hostname:</strong> {{ hostname }}</p>
+            <p><strong>Primary IP:</strong> {{ ip_address }}</p>
+            <p><strong>Example QR URL:</strong> {{ qr_example }}</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">All Network Interfaces</div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for ip in all_interfaces %}
+                <li class="list-group-item">{{ ip }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Connection Test</div>
+        <div class="card-body">
+            <p id="connection-status" class="alert alert-warning">Testing connection...</p>
+            <button id="test-connection" class="btn btn-primary">
+                Re-test Connection
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const testConnection = async () => {
+        const statusEl = document.getElementById('connection-status');
+        statusEl.className = 'alert alert-info';
+        statusEl.textContent = 'Testing connection...';
+        
+        try {
+            const response = await fetch('{{ qr_example }}');
+            if (response.ok) {
+                statusEl.className = 'alert alert-success';
+                statusEl.textContent = '✓ Connection successful!';
+            } else {
+                statusEl.className = 'alert alert-danger';
+                statusEl.textContent = '✗ Connection failed (server error)';
+            }
+        } catch (error) {
+            statusEl.className = 'alert alert-danger';
+            statusEl.textContent = `✗ Connection failed: ${error.message}`;
+        }
+    };
+
+    // Initial test
+    testConnection();
+    
+    // Manual test button
+    document.getElementById('test-connection').addEventListener('click', testConnection);
+});
+</script>
+{% endblock %}

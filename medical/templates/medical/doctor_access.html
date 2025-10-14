@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doctor Access</title>
+    <style>
+        :root {
+            --primary: #2b6ff0;
+            --primary-600: #1f5bd1;
+            --primary-700: #184aa8;
+            --bg: #f6f9ff;
+            --white: #ffffff;
+            --text: #0f172a;   /* slate-900 */
+            --muted: #64748b;  /* slate-500 */
+            --line: #e7eefc;
+            --shadow: 0 10px 30px rgba(31,91,209,0.12);
+            --danger: #e63946;
+            --success: #16a34a;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; background: linear-gradient(180deg, #ffffff 0%, var(--bg) 100%); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', Arial, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif; }
+        .page { min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto; }
+        .shell { max-width: 980px; margin: 0 auto; padding: 0 16px; }
+
+        /* Hero */
+        .hero { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-600) 60%, var(--primary-700) 100%); min-height: 140px; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 24px 0 18px 0; }
+        .hero::after { content: ''; position: absolute; inset: 0; background: radial-gradient(700px 160px at 20% 0%, rgba(255,255,255,0.22), transparent 55%), radial-gradient(700px 160px at 80% -10%, rgba(255,255,255,0.16), transparent 55%); pointer-events: none; }
+        .hero-inner { position: relative; z-index: 1; }
+        .hero-title { color: #fff; font-weight: 900; letter-spacing: .2px; margin: 0; font-size: 24px; text-shadow: 0 2px 6px rgba(0,0,0,0.12); }
+        .hero-sub { color: rgba(255,255,255,0.92); margin-top: 4px; font-size: 13px; }
+
+        /* Card */
+        .card { background: var(--white); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; margin-top: 16px; }
+        .card-body { padding: 20px 18px; display: grid; gap: 16px; }
+
+        .patient { background: #fbfdff; border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+        .patient h3 { margin: 0 0 10px 0; color: var(--primary-700); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+        .item .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 2px; }
+        .item .value { font-size: 16px; font-weight: 600; word-break: break-word; }
+
+        .form { display: grid; gap: 12px; }
+        .field { display: grid; gap: 6px; }
+        .field label { font-weight: 600; font-size: 14px; color: var(--text); }
+        .input { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 15px; background: #fff; outline: none; transition: border-color .2s ease, box-shadow .2s ease; }
+        .input:focus { border-color: var(--primary-600); box-shadow: 0 0 0 3px rgba(43, 111, 240, 0.15); }
+        .hint { font-size: 12px; color: var(--muted); }
+
+        .actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .btn { display: inline-block; text-decoration: none; border-radius: 10px; padding: 12px 16px; font-weight: 800; font-size: 14px; letter-spacing: .2px; border: none; cursor: pointer; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-700)); color: #fff; box-shadow: 0 6px 18px rgba(31,91,209,0.25); }
+        .btn-primary:hover { filter: brightness(1.03); }
+
+        .error { color: var(--danger); font-size: 13px; margin-top: 6px; }
+        .note { font-size: 12px; color: var(--muted); text-align: right; }
+
+        @media (max-width: 680px) {
+            .grid { grid-template-columns: 1fr; }
+            .actions { flex-direction: column; }
+            .btn { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <header class="hero">
+        <div class="shell hero-inner">
+            <h1 class="hero-title">Doctor Access</h1>
+            <div class="hero-sub">Enter the access code to view full medical details</div>
+        </div>
+    </header>
+
+    <main>
+        <div class="shell">
+            <div class="card">
+                <div class="card-body">
+                    <section class="patient">
+                        <h3>Patient</h3>
+                        <div class="grid">
+                            <div class="item">
+                                <div class="label">Full Name</div>
+                                <div class="value">{{ profile.full_name }}</div>
+                            </div>
+                            <div class="item">
+                                <div class="label">National ID</div>
+                                <div class="value">{{ profile.national_id }}</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <form method="post" class="form" autocomplete="off">
+                        {% csrf_token %}
+                        {% if not otp_pending %}
+                            <div class="field">
+                                <label for="email">Email</label>
+                                <input class="input" type="email" name="email" id="email" placeholder="Enter your email to receive OTP" value="{{ email_value }}" required />
+                                <div class="hint">We will email a one-time code valid for a few minutes.</div>
+                            </div>
+                            <div class="actions">
+                                <button type="submit" name="action" value="send_otp" class="btn btn-primary">Send OTP</button>
+                            </div>
+                        {% else %}
+                            <div class="field">
+                                <label for="access_code">Enter OTP (sent to {{ email_value }})</label>
+                                <input class="input" type="text" name="access_code" id="access_code" placeholder="6-digit code" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required />
+                                <div class="hint">Check your email for the 6-digit code. It expires soon.</div>
+                                {% if error %}
+                                    <div class="error">{{ error }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="field">
+                                <label for="reason">Reason for access</label>
+                                <textarea class="input" name="reason" id="reason" placeholder="e.g., Emergency assessment, ongoing treatment, follow-up" rows="3" required></textarea>
+                                <div class="hint">Provide a brief clinical reason; this is logged with your access.</div>
+                            </div>
+                            <div class="actions">
+                                <button type="submit" name="action" value="verify_otp" class="btn btn-primary">Verify Access</button>
+                            </div>
+                        {% endif %}
+                        <div class="note">Unauthorized use is prohibited. Access is logged.</div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,78 @@
+{% extends "medical/base.html" %}
+{% block content %}
+<style>
+    .about-section {
+        background-color: #f7f9fb;
+        padding: 80px 20px;
+        font-family: 'Segoe UI', sans-serif;
+        color: #1a1a1a;
+    }
+
+    .about-container {
+        max-width: 900px;
+        margin: auto;
+        background: white;
+        padding: 60px 40px;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+    }
+
+    .about-container h1 {
+        font-size: 2.8rem;
+        margin-bottom: 30px;
+        color: #007acc;
+    }
+
+    .about-container p {
+        font-size: 1.1rem;
+        line-height: 1.75;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .quote {
+        margin-top: 40px;
+        font-size: 1.15rem;
+        font-style: italic;
+        color: #007acc;
+        border-left: 4px solid #007acc;
+        padding-left: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .about-container {
+            padding: 40px 20px;
+        }
+
+        .about-container h1 {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<div class="about-section">
+    <div class="about-container">
+        <h1>About This System</h1>
+        <p>
+            In emergencies, time isn’t just critical — it’s everything. This system exists to bridge the gap between **what caregivers need to know** and **what patients may not be able to say**.
+        </p>
+        <p>
+            Imagine arriving at a hospital unconscious. What allergies do you have? Are you diabetic? Do you have a heart condition? Who should they call? These aren’t just details — they’re the difference between life and death.
+        </p>
+        <p>
+            This platform allows hospitals to securely access and manage critical patient information in real-time — creating a national backbone for life-saving medical data.
+        </p>
+        <p>
+            We are building more than software. We are building a network of **preparedness, protection, and precision**, so that when your voice can’t speak, your records will.
+        </p>
+        <p>
+            This is the future of emergency care: connected, informed, and life-centered.
+        </p>
+
+        <div class="quote">
+            “The true power of technology is not in automation, but in amplification — of dignity, of care, of life itself.”<br><br>
+            — A visionary system for people who still believe code should serve the human condition.
+        </div>
+    </div>
+</div>
+{% endblock %}

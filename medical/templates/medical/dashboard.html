@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analytics Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f7fa;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 50px auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3e50;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        .card h2 {
+            margin: 0;
+            font-size: 22px;
+            color: #34495e;
+        }
+
+        .stat {
+            font-size: 26px;
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        .gender-bar {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .gender-item {
+            background: #ecf0f1;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table th, table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        table th {
+            background: #3498db;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>System Analytics Dashboard</h1>
+
+        <div class="card">
+            <h2>Total Patients</h2>
+            <p class="stat">{{ total_patients }}</p>
+        </div>
+
+        <div class="card">
+            <h2>Total Visits</h2>
+            <p class="stat">{{ total_visits }}</p>
+        </div>
+
+        <div class="card">
+            <h2>Repeat Visit Rate</h2>
+            <p class="stat">{{ repeat_rate }}%</p>
+        </div>
+
+        <div class="card">
+            <h2>Gender Distribution</h2>
+            <div class="gender-bar">
+                {% for gender in gender_counts %}
+                    <div class="gender-item">
+                        {{ gender.gender|title }}: {{ gender.count }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Top 5 Clinics by Visits</h2>
+            <table>
+                <tr>
+                    <th>Clinic Name</th>
+                    <th>Number of Visits</th>
+                </tr>
+                {% for clinic in top_clinics %}
+                    <tr>
+                        <td>{{ clinic.name }}</td>
+                        <td>{{ clinic.visit_count }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2">No clinic data available.</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</body>
+</html>

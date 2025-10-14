@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Medical Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary: #0A6EBD;
+            --background: #F3F6FA;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --label: #555555;
+            --border: #dcdcdc;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--background);
+            margin: 0;
+            padding: 0;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 2rem auto;
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h2 {
+            color: var(--primary);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .info-group {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: var(--label);
+            width: 40%;
+        }
+
+        .info-value {
+            width: 58%;
+            text-align: right;
+        }
+
+        .qr-container {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .qr-container img {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+            border: 1px solid var(--border);
+            padding: 10px;
+            background-color: white;
+            border-radius: 8px;
+        }
+
+        .empty-value {
+            color: #999;
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            .info-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .info-label, .info-value {
+                width: 100%;
+                text-align: left;
+            }
+
+            .info-value {
+                margin-top: 0.3rem;
+            }
+
+            .qr-container img {
+                width: 100%;
+                max-width: 250px;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Emergency Medical Profile</h2>
+        </div>
+
+        <div class="profile-info">
+            <div class="info-group">
+                <span class="info-label">Full Name</span>
+                <span class="info-value">{{ profile_data.full_name }}</span>
+            </div>
+
+            <div class="info-group">
+                <span class="info-label">National ID</span>
+                <span class="info-value">{{ profile_data.national_id }}</span>
+            </div>
+
+            <div class="info-group">
+                <span class="info-label">Blood Type</span>
+                <span class="info-value">{{ profile_data.blood_type|default_if_none:"<span class='empty-value'>Not specified</span>"|safe }}</span>
+            </div>
+
+            <div class="info-group">
+                <span class="info-label">Allergies</span>
+                <span class="info-value">{{ profile_data.allergies|default_if_none:"<span class='empty-value'>Not specified</span>"|safe }}</span>
+            </div>
+
+            <div class="info-group">
+                <span class="info-label">Medical Conditions</span>
+                <span class="info-value">{{ profile_data.medical_conditions|default_if_none:"<span class='empty-value'>Not specified</span>"|safe }}</span>
+            </div>
+
+            <div class="info-group">
+                <span class="info-label">Medications</span>
+                <span class="info-value">{{ profile_data.medications|default_if_none:"<span class='empty-value'>Not specified</span>"|safe }}</span>
+            </div>
+
+            <div class="info-group">
+                <span class="info-label">Emergency Contact</span>
+                <span class="info-value">{{ profile_data.emergency_contact }}</span>
+            </div>
+
+            <div class="info-group">
+                <span class="info-label">Phone Number</span>
+                <span class="info-value">{{ profile_data.phone_number }}</span>
+            </div>
+        </div>
+
+        <div class="qr-container">
+            <h3>Scan QR Code</h3>
+            <img src="{{ profile_data.qr_code.url }}" alt="QR Code">
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Profile - {{ profile.full_name }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 2rem;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #e0ecff, #f5f7fa);
+      color: #2c3e50;
+      min-height: 100vh;
+    }
+
+    .edit-container {
+      max-width: 700px;
+      background: #ffffff;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+      animation: slideIn 0.4s ease;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2rem;
+      color: #3b3b3b;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #ced4da;
+      border-radius: 8px;
+      font-size: 1rem;
+      background-color: #f9f9f9;
+      transition: border 0.2s, background-color 0.2s;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #4361ee;
+      background-color: #fff;
+      outline: none;
+    }
+
+    small {
+      color: #6c757d;
+    }
+
+    .form-actions {
+      text-align: right;
+      margin-top: 2rem;
+    }
+
+    button {
+      background-color: #4361ee;
+      color: #ffffff;
+      font-weight: 600;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(67, 97, 238, 0.2);
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #3a56d4;
+      transform: translateY(-2px);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .edit-container {
+        padding: 2rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="edit-container">
+    <h2>Edit Profile: {{ profile.full_name }}</h2>
+    <form method="post" action="">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+        <small>{{ field.help_text }}</small>
+        {% endif %}
+        {% for error in field.errors %}
+        <div style="color: #d9534f;">{{ error }}</div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+      <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}" />
+      <div class="form-actions">
+        <button type="submit">💾 Save Changes</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

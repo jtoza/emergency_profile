@@ -1,0 +1,126 @@
+
+
+{% extends 'medical/base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<style>
+    /* Layout & Spacing */
+    .form-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 95vh;
+        background: linear-gradient(to bottom right, #f8f9fa, #e9ecef);
+        padding: 30px;
+    }
+
+    .profile-card {
+        position: relative;
+        background: #ffffff;
+        border-radius: 1.5rem;
+        max-width: 750px;
+        width: 100%;
+        padding: 50px 40px;
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    .typing-title {
+        font-family: 'Courier New', monospace;
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #212529;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        border-right: 3px solid #0d6efd;
+        width: 0;
+        margin-bottom: 35px;
+        animation: typing 3.5s steps(45, end), blink .75s step-end infinite;
+    }
+
+    @keyframes typing {
+        from { width: 0 }
+        to { width: 100% }
+    }
+
+    @keyframes blink {
+        50% { border-color: transparent }
+    }
+
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .btn-save {
+        background-color: #0d6efd;
+        color: white;
+        padding: 12px 50px;
+        border: none;
+        border-radius: 50px;
+        font-weight: bold;
+        transition: 0.3s ease-in-out;
+    }
+
+    .btn-save:hover {
+        background-color: #0b5ed7;
+    }
+
+
+    .beacon {
+        position: absolute;
+        top: -12px;
+        right: -12px;
+        width: 22px;
+        height: 22px;
+        background-color: red;
+        border-radius: 50%;
+        box-shadow: 0 0 10px red;
+        animation: pulse 1.2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 5px red; }
+        50% { box-shadow: 0 0 20px blue; }
+        100% { box-shadow: 0 0 5px green; }
+    }
+
+    @media (max-width: 768px) {
+        .profile-card {
+            padding: 30px 20px;
+        }
+
+        .typing-title {
+            font-size: 1.4rem;
+        }
+    }
+</style>
+
+<div class="form-wrapper">
+    <div class="profile-card">
+        <div class="beacon"></div>
+        <div class="typing-title">Creating a Smarter Medical Future, whee details are not just details but critical data</div>
+
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="mb-4">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field|add_class:"form-control" }}
+                    {% if field.help_text %}
+                        <div class="form-text text-muted">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-save">Save Profile</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

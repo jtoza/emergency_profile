@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 512 512" fill="none">
+  <!-- Maskable, full-bleed background -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4361EE"/>
+      <stop offset="100%" stop-color="#4CC9F0"/>
+    </linearGradient>
+    <filter id="s" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="rgba(0,0,0,0.25)"/>
+    </filter>
+  </defs>
+
+  <!-- Full-bleed rounded rect for maskable area (safe for Android mask shapes) -->
+  <rect x="0" y="0" width="512" height="512" rx="112" ry="112" fill="url(#bg)"/>
+
+  <!-- Inner safe zone (roughly 80% area) -->
+  <g transform="translate(256 256)">
+    <!-- Medical cross with heart pulse motif -->
+    <g filter="url(#s)">
+      <rect x="-55" y="-140" width="110" height="280" rx="24" fill="#FFFFFF" opacity="0.95"/>
+      <rect x="-140" y="-55" width="280" height="110" rx="24" fill="#FFFFFF" opacity="0.95"/>
+    </g>
+    <!-- Heart pulse line -->
+    <path d="M -120,60 C -80,40 -40,40 -10,20 L 0,0 L 12,20 C 36,44 72,44 120,28" stroke="#3A0CA3" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <!-- Small heart -->
+    <path d="M -6,-14 c -10,-16 7,-28 18,-14 c 11,-14 28,-2 18,14 c -6,10 -18,18 -18,18 s -12,-8 -18,-18 z" fill="#F43F5E"/>
+  </g>
+
+  <!-- Optional subtle gloss -->
+  <path d="M32,96 C64,40 144,16 256,16 C368,16 448,40 480,96 C416,64 352,64 256,64 C160,64 96,64 32,96 Z" fill="#FFFFFF" opacity="0.08"/>
+</svg>

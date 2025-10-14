@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Health Monitoring | MediTrack</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --primary-dark: #3a0ca3;
+      --accent: #4cc9f0;
+      --light: #f8f9fa;
+      --dark: #2b2d42;
+      --muted: #6c757d;
+      --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Poppins', sans-serif; background:#f9fafb; color: var(--dark); line-height: 1.6; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+    /* Hero */
+    .hero {
+      background: radial-gradient(600px 200px at 10% -20%, rgba(72,149,239,0.18), transparent),
+                  radial-gradient(600px 200px at 110% 0%, rgba(76,201,240,0.18), transparent),
+                  linear-gradient(135deg, #fafcff 0%, #eef2ff 100%);
+      border: 1px solid rgba(67,97,238,0.15);
+      border-radius: 16px;
+      padding: 1.25rem;
+      box-shadow: var(--box-shadow);
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    .hero::before { content: ''; position: absolute; inset: -2px; border-radius: 18px; background: radial-gradient(800px 120px at 50% -10%, rgba(67,97,238,0.18), transparent 60%); pointer-events: none; }
+    .hero h1 { margin-bottom: 0.25rem; }
+    .hero .subtitle { font-size: 0.95rem; color: var(--muted); margin-top: .25rem; }
+    .chips { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.75rem; }
+    .chip { display:inline-flex; align-items:center; gap:.4rem; padding:.4rem .6rem; border-radius:999px; background: rgba(67,97,238,0.1); color:#3a0ca3; font-weight:600; font-size:.8rem; border:1px solid rgba(67,97,238,0.15); }
+
+    /* Grid and cards */
+    .section { margin: 1.25rem 0; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+    .card { background: rgba(255,255,255,0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(67,97,238,0.12); border-radius: 16px; box-shadow: 0 12px 30px rgba(67,97,238,0.08); padding: 1rem; transition: .2s ease; }
+    .card:hover { box-shadow: 0 18px 36px rgba(67,97,238,0.12); transform: translateY(-2px); }
+    .card h3 { margin-bottom: 0.5rem; }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .row input, .row select { border: 1px solid rgba(0,0,0,0.08); border-radius: 10px; padding: 0.6rem; background:#fff; }
+
+    .btn { padding: 0.6rem 1rem; border-radius: 10px; border: 1px solid rgba(0,0,0,0.08); cursor: pointer; }
+    .btn-primary { background: linear-gradient(135deg, #4361ee, #3f37c9); color: #fff; border: none; box-shadow: 0 12px 24px rgba(67,97,238,0.35); }
+    .btn-outline { background: #fff; color: var(--primary); border: 1px solid var(--primary); }
+
+    .row-actions { display:flex; gap: 0.5rem; justify-content: flex-end; margin: 0.5rem 0 1rem; }
+
+    .list { list-style: none; padding: 0; margin: 0.5rem 0 0 0; }
+    .pill { display:inline-flex; align-items:center; gap:6px; background:#f3f4f6; padding:6px 10px; border-radius:999px; font-size:0.9rem }
+
+    .kpi { display:flex; gap: 1rem; flex-wrap: wrap; }
+    .kpi .item { background: #fff; border: 1px solid rgba(0,0,0,0.06); border-radius: 12px; padding: 0.75rem 1rem; box-shadow: var(--box-shadow); }
+
+    .muted { color: var(--muted); }
+    .small { font-size: 0.9rem; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 8px; border-bottom: 1px solid #eee; text-align:left; font-size: 0.95rem; }
+    .progress { height: 10px; background: #eef2ff; border-radius: 999px; overflow: hidden; }
+    .progress > div { height: 100%; background: linear-gradient(90deg, #4361ee, #4cc9f0); }
+
+    .alert-banner { background: rgba(244,67,54,0.08); border: 1px solid rgba(244,67,54,0.25); color: #b91c1c; padding: 0.75rem 1rem; border-radius: 12px; margin: 0.5rem 0 0.75rem; }
+    .insights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; }
+    .insight-card { background: #fff; border: 1px solid rgba(0,0,0,0.06); border-radius: 12px; padding: 0.75rem 1rem; box-shadow: var(--box-shadow); }
+    .insight-card .label { color: var(--muted); font-size: 0.85rem; }
+    .insight-card .value { font-size: 1.25rem; font-weight: 700; margin-top: 0.25rem; }
+    .insight-card .sub { color: var(--muted); font-size: 0.9rem; }
+
+    .settings-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 0.5rem; }
+    .settings-row input { max-width: 180px; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; padding: 0.5rem; }
+
+    @media print {
+      .row-actions { display: none !important; }
+      body { background: #fff; }
+      .card { box-shadow: none !important; border: 1px solid #e5e7eb; }
+      .grid { grid-template-columns: 1fr !important; gap: 0.75rem; }
+      .hero { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <div class="hero-content">
+        <h1>Health Monitoring</h1>
+        <p class="subtitle">Gentle tools to support daily wellbeing — track medications, blood pressure, hydration, and habits with a calm, simple interface.</p>
+        <div class="chips">
+          <span class="chip"><i class="fa-solid fa-leaf"></i> Wellbeing</span>
+          <span class="chip"><i class="fa-solid fa-lock"></i> Private</span>
+          <span class="chip"><i class="fa-solid fa-bell"></i> Reminders</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="row-actions">
+      <button class="btn btn-outline" id="btn-print"><i class="fa-solid fa-print"></i> Print</button>
+      <button class="btn btn-primary" id="btn-download"><i class="fa-solid fa-download"></i> Download Page</button>
+    </div>
+
+    <div class="section grid">
+      <!-- Medication -->
+      <div class="card">
+        <h3><i class="fa-solid fa-pills"></i> Medication Schedule</h3>
+        <div class="row">
+          <input id="med-name" type="text" placeholder="Medication name" />
+          <input id="med-dose" type="text" placeholder="Dosage (e.g., 5mg)" />
+        </div>
+        <div class="row">
+          <input id="med-time" type="time" />
+          <select id="med-frequency">
+            <option value="daily">Daily</option>
+            <option value="bid">Twice daily</option>
+            <option value="tid">Three times daily</option>
+            <option value="weekly">Weekly</option>
+          </select>
+        </div>
+        <div class="row">
+          <input id="med-notes" type="text" placeholder="Notes (before food, etc.)" />
+          <button class="btn btn-primary" id="add-med">Add</button>
+        </div>
+        <ul class="list" id="med-list"></ul>
+      </div>
+
+      <!-- Blood Pressure -->
+      <div class="card">
+        <h3><i class="fa-solid fa-heart-pulse"></i> Blood Pressure</h3>
+        <div class="row">
+          <input id="bp-sys" type="number" placeholder="Systolic" />
+          <input id="bp-dia" type="number" placeholder="Diastolic" />
+        </div>
+        <div class="row">
+          <input id="bp-pulse" type="number" placeholder="Pulse" />
+          <input id="bp-time" type="datetime-local" />
+        </div>
+        <div class="row">
+          <input id="bp-notes" type="text" placeholder="Notes (sitting, morning, etc.)" />
+          <button class="btn btn-primary" id="add-bp">Log</button>
+        </div>
+        <table id="bp-table">
+          <thead><tr><th>Date</th><th>Sys/Dia</th><th>Pulse</th><th>Notes</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Hydration -->
+      <div class="card">
+        <h3><i class="fa-solid fa-glass-water"></i> Hydration</h3>
+        <div class="kpi">
+          <div class="item"><strong id="water-total">0</strong> ml today</div>
+          <div class="item">Goal: <span id="water-goal">2000</span> ml</div>
+        </div>
+        <div class="progress" style="margin: 0.5rem 0 0.75rem 0"><div id="water-progress" style="width:0%"></div></div>
+        <div class="row">
+          <input id="water-amount" type="number" placeholder="Amount (ml)" />
+          <button class="btn btn-primary" id="add-water">Add Intake</button>
+        </div>
+        <ul class="list" id="water-list"></ul>
+      </div>
+
+      <!-- Habits -->
+      <div class="card">
+        <h3><i class="fa-solid fa-check-double"></i> Habits & Reminders</h3>
+        <div class="row">
+          <input id="habit-name" type="text" placeholder="Habit (e.g., Walk 20 min)" />
+          <select id="habit-target">
+            <option value="1">1x/day</option>
+            <option value="2">2x/day</option>
+            <option value="3">3x/day</option>
+          </select>
+        </div>
+        <div class="row">
+          <input id="habit-time" type="time" />
+          <button class="btn btn-primary" id="add-habit">Add Habit</button>
+        </div>
+        <ul class="list" id="habit-list"></ul>
+        <p class="muted small">Enable browser notifications to receive reminders at the selected time. <button class="btn btn-outline" id="enable-notif" style="margin-left:.5rem">Enable notifications</button></p>
+      </div>
+
+      <!-- Charts -->
+      <div class="card">
+        <h3><i class="fa-solid fa-chart-line"></i> Blood Pressure Trend</h3>
+        <canvas id="bp-chart" height="240"></canvas>
+      </div>
+      <div class="card">
+        <h3><i class="fa-solid fa-droplet"></i> Hydration (Last 7 Days)</h3>
+        <canvas id="water-chart" height="240"></canvas>
+      </div>
+      <div class="card">
+        <h3><i class="fa-solid fa-person-walking"></i> Steps (Last 14 Days)</h3>
+        <div class="row">
+          <input id="steps-count" type="number" placeholder="Add steps" />
+          <button class="btn btn-primary" id="add-steps">Add</button>
+        </div>
+        <canvas id="steps-chart" height="240"></canvas>
+        <ul class="list" id="steps-list"></ul>
+        <div class="kpi"><div class="item"><strong id="steps-today">0</strong> steps today</div></div>
+      </div>
+      <div class="card">
+        <h3><i class="fa-solid fa-heart-circle-bolt"></i> Heart Rate</h3>
+        <div class="row">
+          <input id="hr-bpm" type="number" placeholder="BPM" />
+          <input id="hr-time" type="datetime-local" />
+        </div>
+        <div class="row">
+          <input id="hr-notes" type="text" placeholder="Notes (resting, post-walk, etc.)" />
+          <button class="btn btn-primary" id="add-hr">Log</button>
+        </div>
+        <canvas id="hr-chart" height="240"></canvas>
+        <table id="hr-table">
+          <thead><tr><th>Time</th><th>BPM</th><th>Notes</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Insights -->
+      <div class="card">
+        <h3><i class="fa-solid fa-lightbulb"></i> Insights</h3>
+        <div id="alert-banner" class="alert-banner" style="display:none"></div>
+        <div class="insights-grid">
+          <div class="insight-card">
+            <div class="label">Today's BP average</div>
+            <div class="value" id="ins-bp-today">--</div>
+            <div class="sub" id="ins-bp-class">--</div>
+          </div>
+          <div class="insight-card">
+            <div class="label">7-day BP average</div>
+            <div class="value" id="ins-bp-7d">--</div>
+          </div>
+          <div class="insight-card">
+            <div class="label">Hydration progress</div>
+            <div class="value" id="ins-water-pct">--</div>
+            <div class="sub" id="ins-water-streak">--</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="card">
+        <h3><i class="fa-solid fa-gear"></i> Settings</h3>
+        <div class="settings-row">
+          <label for="pref-water-goal">Daily water goal (ml)</label>
+          <input id="pref-water-goal" type="number" min="500" step="100" />
+          <button class="btn btn-outline" id="save-prefs">Save</button>
+        </div>
+      </div>
+
+      <!-- Export & Sync -->
+      <div class="card">
+        <h3><i class="fa-solid fa-file-export"></i> Export & Sync</h3>
+        <div class="row">
+          <button class="btn btn-outline" id="export-bp">Export BP CSV</button>
+          <button class="btn btn-outline" id="export-water">Export Hydration CSV</button>
+        </div>
+        <div style="margin-top:.75rem">
+          <div class="row">
+            <input type="text" id="sync-nid" placeholder="National ID (for your profile)" />
+            <input type="email" id="sync-email" placeholder="Owner Email (must match profile)" />
+          </div>
+          <div class="row">
+            <button class="btn btn-primary" id="btn-sync">Sync to Profile</button>
+            <div id="sync-status" class="muted small"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+  (function(){
+    const storage = {
+      get(key, def){ try { return JSON.parse(localStorage.getItem(key)) ?? def; } catch(e){ return def; } },
+      set(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+    };
+
+    const userKey = 'u{{ request.user.id }}_';
+    const prefsKey = userKey + 'mt_prefs_v1';
+    let prefs = storage.get(prefsKey, { water_goal: 2000 });
+
+    // Medication
+    const medsKey = userKey + 'mt_meds_v1';
+    const medList = document.getElementById('med-list');
+    function renderMeds(){ const meds = storage.get(medsKey, []); medList.innerHTML = meds.map((m,i)=>`<li class="pill">${m.time} • ${m.name} ${m.dose || ''} <span class="muted">(${m.frequency})</span> <button data-i="${i}" class="rm">✕</button></li>`).join(''); }
+    document.getElementById('add-med').onclick = () => {
+      const m = { name: document.getElementById('med-name').value.trim(), dose: document.getElementById('med-dose').value.trim(), time: document.getElementById('med-time').value, frequency: document.getElementById('med-frequency').value, notes: document.getElementById('med-notes').value.trim() };
+      if(!m.name || !m.time) return;
+      const meds = storage.get(medsKey, []); meds.push(m); storage.set(medsKey, meds); renderMeds(); scheduleNotifications();
+      document.getElementById('med-name').value=''; document.getElementById('med-dose').value=''; document.getElementById('med-time').value=''; document.getElementById('med-notes').value='';
+    };
+    medList.addEventListener('click', (e)=>{ if(e.target.matches('button.rm')) { const i=+e.target.dataset.i; const meds = storage.get(medsKey, []); meds.splice(i,1); storage.set(medsKey, meds); renderMeds(); scheduleNotifications(); } });
+
+    // Blood Pressure
+    const bpKey = userKey + 'mt_bp_v1';
+    const bpTBody = document.querySelector('#bp-table tbody');
+    const hrKey = userKey + 'mt_hr_v1';
+    const stepsKey = userKey + 'mt_steps_v1';
+    function renderBP(){ const rows = storage.get(bpKey, []); bpTBody.innerHTML = rows.map(r=>`<tr><td>${new Date(r.time).toLocaleString()}</td><td>${r.sys}/${r.dia}</td><td>${r.pulse||''}</td><td>${r.notes||''}</td></tr>`).join(''); }
+    document.getElementById('add-bp').onclick = () => {
+      const r = { sys: +document.getElementById('bp-sys').value, dia: +document.getElementById('bp-dia').value, pulse: document.getElementById('bp-pulse').value ? +document.getElementById('bp-pulse').value : null, time: document.getElementById('bp-time').value || new Date().toISOString(), notes: document.getElementById('bp-notes').value.trim() };
+      if(!r.sys || !r.dia) return;
+      const rows = storage.get(bpKey, []); rows.unshift(r); storage.set(bpKey, rows.slice(0,1000)); renderBP(); renderBPChart(); computeInsights();
+      document.getElementById('bp-sys').value=''; document.getElementById('bp-dia').value=''; document.getElementById('bp-pulse').value=''; document.getElementById('bp-time').value=''; document.getElementById('bp-notes').value='';
+    };
+
+    // Hydration
+    const waterKey = userKey + 'mt_water_v1';
+    const waterList = document.getElementById('water-list');
+    const waterTotalEl = document.getElementById('water-total');
+    const waterGoalEl = document.getElementById('water-goal');
+    const waterProg = document.getElementById('water-progress');
+    function todayKey(){ const d = new Date(); return d.toISOString().slice(0,10); }
+    function renderWater(){
+      const data = storage.get(waterKey, {}); const tk = todayKey(); const entries = data[tk] || []; const total = entries.reduce((a,b)=>a + (b.amount||0), 0);
+      waterTotalEl.textContent = total; const goal = (prefs && prefs.water_goal) ? prefs.water_goal : 2000; waterGoalEl.textContent = goal; waterProg.style.width = Math.min(100, Math.round((total/goal)*100)) + '%';
+      waterList.innerHTML = entries.map((e,i)=>`<li class="pill">${e.amount} ml at ${new Date(e.time).toLocaleTimeString()} <button data-i="${i}" class="rm">✕</button></li>`).join('');
+    }
+    document.getElementById('add-water').onclick = () => {
+      const amount = +document.getElementById('water-amount').value; if(!amount) return; const data = storage.get(waterKey, {}); const tk = todayKey();
+      data[tk] = data[tk] || []; data[tk].push({ amount, time: new Date().toISOString() }); storage.set(waterKey, data); renderWater(); renderWaterChart(); computeInsights(); document.getElementById('water-amount').value='';
+    };
+    waterList.addEventListener('click', (e)=>{ if(e.target.matches('button.rm')) { const i=+e.target.dataset.i; const data = storage.get(waterKey, {}); const tk = todayKey(); data[tk].splice(i,1); storage.set(waterKey, data); renderWater(); renderWaterChart(); computeInsights(); } });
+
+    // Habits
+    const habitKey = userKey + 'mt_habits_v1';
+    const habitList=document.getElementById('habit-list');
+    function renderHabits(){ const items = storage.get(habitKey, []); habitList.innerHTML = items.map((h,i)=>`<li class="pill">${h.time || '--:--'} • ${h.name} (${h.target}x) <button data-i="${i}" class="rm">✕</button></li>`).join(''); }
+    document.getElementById('add-habit').onclick = () => {
+      const h = { name: document.getElementById('habit-name').value.trim(), target: +document.getElementById('habit-target').value, time: document.getElementById('habit-time').value };
+      if(!h.name) return; const items = storage.get(habitKey, []); items.push(h); storage.set(habitKey, items); renderHabits(); scheduleNotifications(); document.getElementById('habit-name').value=''; document.getElementById('habit-time').value='';
+    };
+    habitList.addEventListener('click', (e)=>{ if(e.target.matches('button.rm')) { const i=+e.target.dataset.i; const items = storage.get(habitKey, []); items.splice(i,1); storage.set(habitKey, items); renderHabits(); scheduleNotifications(); } });
+
+    // Notifications
+    let reminderTimers = [];
+    function clearReminderTimers(){ try{ reminderTimers.forEach(id => clearTimeout(id)); }catch(e){} reminderTimers = []; }
+    async function requestNotifications(){
+      if(!('Notification' in window)) { alert('This browser does not support notifications.'); return false; }
+      if(Notification.permission === 'granted') return true;
+      const perm = await Notification.requestPermission();
+      return perm === 'granted';
+    }
+    function scheduleOneDaily(time, text){
+      const [h,m] = (time||'').split(':').map(Number);
+      if(!Number.isFinite(h) || !Number.isFinite(m)) return;
+      const calcNext = () => { const now = new Date(); const t = new Date(); t.setHours(h,m,0,0); if(t <= now) t.setDate(t.getDate()+1); return t; };
+      const scheduleNext = () => {
+        const target = calcNext();
+        const delay = Math.max(0, target - new Date());
+        const id = setTimeout(() => {
+          try { if('Notification' in window && Notification.permission==='granted'){ new Notification('MediTrack Reminder', { body: text }); } else { alert(text); } } catch(e){}
+          scheduleNext();
+        }, delay);
+        reminderTimers.push(id);
+      };
+      scheduleNext();
+    }
+    async function scheduleNotifications(){
+      const ok = await requestNotifications(); if(!ok) return;
+      clearReminderTimers();
+      (storage.get(medsKey, [])||[]).forEach(m=> scheduleOneDaily(m.time, `${m.name} ${m.dose||''} (${m.frequency})`));
+      (storage.get(habitKey, [])||[]).forEach(h=> scheduleOneDaily(h.time, h.name));
+    }
+
+    // Charts
+    let bpChart, waterChart, stepsChart, hrChart;
+    function renderBPChart(){
+      const canvas = document.getElementById('bp-chart'); if(!canvas || typeof Chart === 'undefined') return;
+      const rows = (function(){ try { return JSON.parse(localStorage.getItem(bpKey)) || []; } catch(e){ return []; } })().slice().sort((a,b)=> new Date(a.time) - new Date(b.time));
+      const labels = rows.map(r=> new Date(r.time).toLocaleString()); const sys = rows.map(r=> r.sys); const dia = rows.map(r=> r.dia);
+      if(bpChart){ bpChart.destroy(); }
+      bpChart = new Chart(canvas.getContext('2d'), { type:'line', data:{ labels, datasets:[ { label:'Systolic', data:sys, borderColor:'#ef4444', backgroundColor:'rgba(239,68,68,0.15)', tension:0.35, fill:false, pointRadius:2 }, { label:'Diastolic', data:dia, borderColor:'#60a5fa', backgroundColor:'rgba(96,165,250,0.15)', tension:0.35, fill:false, pointRadius:2 } ] }, options:{ responsive:true, plugins:{ legend:{ display:true }, tooltip:{ mode:'index', intersect:false } }, scales:{ x:{ grid:{ display:false } }, y:{ beginAtZero:false, suggestedMin:60, suggestedMax:180 } } } });
+    }
+    function renderWaterChart(){
+      const canvas = document.getElementById('water-chart'); if(!canvas || typeof Chart === 'undefined') return;
+      const data = (function(){ try { return JSON.parse(localStorage.getItem(waterKey)) || {}; } catch(e){ return {}; } })();
+      const labels = []; const values = []; const goalValues = []; const today = new Date(); const goal = (prefs && prefs.water_goal) ? prefs.water_goal : 2000;
+      for(let i=6; i>=0; i--){ const d = new Date(today); d.setDate(today.getDate()-i); const key = d.toISOString().slice(0,10); labels.push(d.toLocaleDateString(undefined, { weekday: 'short' })); const entries = data[key] || []; values.push(entries.reduce((a,b)=> a + (b.amount||0), 0)); goalValues.push(goal); }
+      if(waterChart){ waterChart.destroy(); }
+      waterChart = new Chart(canvas.getContext('2d'), { type:'bar', data:{ labels, datasets:[ { label:'ml', data:values, backgroundColor:'rgba(67,97,238,0.25)', borderColor:'#4361ee', borderWidth:1, borderRadius:6 }, { label:'Goal', data:goalValues, type:'line', borderColor:'#10b981', backgroundColor:'transparent', pointRadius:0, borderDash:[6,4], tension:0 } ] }, options:{ responsive:true, plugins:{ legend:{ display:true } }, scales:{ y:{ beginAtZero:true, suggestedMax: Math.max(2500, goal + 500) } } } });
+    }
+
+    // Steps
+    const stepsList = document.getElementById('steps-list');
+    const stepsTodayEl = document.getElementById('steps-today');
+    function renderSteps(){
+      const arr = (function(){ try { return JSON.parse(localStorage.getItem(stepsKey)) || []; } catch(e){ return []; } })();
+      const tk = todayKey();
+      const items = arr.map((e,idx)=> ({...e, _idx: idx})).filter(e => (e.date || (e.time||'').slice(0,10)) === tk);
+      const total = items.reduce((a,b)=> a + (Number(b.value || b.steps || 0)), 0);
+      if(stepsTodayEl) stepsTodayEl.textContent = total;
+      if(stepsList){ stepsList.innerHTML = items.map((e)=> `<li class="pill">${Number(e.value || e.steps)} steps at ${new Date(e.time || (e.date+'T00:00:00')).toLocaleTimeString()} <button data-i="${e._idx}" class="rm">✕</button></li>`).join(''); }
+    }
+    const addStepsBtn = document.getElementById('add-steps');
+    if(addStepsBtn){ addStepsBtn.onclick = () => { const n = +document.getElementById('steps-count').value; if(!n) return; const arr = (function(){ try { return JSON.parse(localStorage.getItem(stepsKey)) || []; } catch(e){ return []; } })(); arr.push({ value: n, date: todayKey(), time: new Date().toISOString() }); localStorage.setItem(stepsKey, JSON.stringify(arr.slice(-2000))); renderSteps(); renderStepsChart(); computeInsights(); document.getElementById('steps-count').value = ''; }; }
+    if(stepsList){ stepsList.addEventListener('click', (e)=>{ if(e.target.matches('button.rm')){ const idx = +e.target.dataset.i; const arr = (function(){ try { return JSON.parse(localStorage.getItem(stepsKey)) || []; } catch(e){ return []; } })(); arr.splice(idx,1); localStorage.setItem(stepsKey, JSON.stringify(arr)); renderSteps(); renderStepsChart(); computeInsights(); } }); }
+
+    function renderStepsChart(){
+      const canvas = document.getElementById('steps-chart'); if(!canvas || typeof Chart === 'undefined') return;
+      const arr = (function(){ try { return JSON.parse(localStorage.getItem(stepsKey)) || []; } catch(e){ return []; } })();
+      const dayMap = new Map();
+      arr.forEach(s => { const key = (s.date || (s.time||'').slice(0,10)); const val = Number(s.value || s.steps || 0); dayMap.set(key, (dayMap.get(key)||0) + val); });
+      const today = new Date(); const labels=[]; const values=[];
+      for(let i=13;i>=0;i--){ const d = new Date(today); d.setDate(today.getDate()-i); const k = d.toISOString().slice(0,10); labels.push(d.toLocaleDateString(undefined, { month:'short', day:'numeric' })); values.push(dayMap.get(k) || 0); }
+      if(stepsChart){ stepsChart.destroy(); }
+      stepsChart = new Chart(canvas.getContext('2d'), { type: 'bar', data:{ labels, datasets:[ { label:'Steps', data:values, backgroundColor:'rgba(16,185,129,0.25)', borderColor:'#10b981', borderWidth:1, borderRadius:6 } ] }, options:{ responsive:true, plugins:{ legend:{ display:true } }, scales:{ y:{ beginAtZero:true } } } });
+    }
+
+    // Heart rate
+    const hrTBody = document.querySelector('#hr-table tbody');
+    function renderHR(){
+      const rows = (function(){ try { return JSON.parse(localStorage.getItem(hrKey)) || []; } catch(e){ return []; } })().slice().sort((a,b)=> new Date(b.time||0) - new Date(a.time||0));
+      if(hrTBody){ hrTBody.innerHTML = rows.map(r => `<tr><td>${new Date(r.time||Date.now()).toLocaleString()}</td><td>${Number(r.bpm || r.hr || r.value || 0)}</td><td>${r.notes || ''}</td></tr>`).join(''); }
+    }
+    const addHRBtn = document.getElementById('add-hr');
+    if(addHRBtn){ addHRBtn.onclick = () => { const bpm = +document.getElementById('hr-bpm').value; const time = document.getElementById('hr-time').value || new Date().toISOString(); const notes = document.getElementById('hr-notes').value.trim(); if(!bpm) return; const arr = (function(){ try { return JSON.parse(localStorage.getItem(hrKey)) || []; } catch(e){ return []; } })(); arr.unshift({ bpm, time, notes }); localStorage.setItem(hrKey, JSON.stringify(arr.slice(0,2000))); renderHR(); renderHRChart(); computeInsights(); document.getElementById('hr-bpm').value=''; document.getElementById('hr-time').value=''; document.getElementById('hr-notes').value=''; }; }
+
+    function renderHRChart(){
+      const canvas = document.getElementById('hr-chart'); if(!canvas || typeof Chart === 'undefined') return;
+      const rows = (function(){ try { return JSON.parse(localStorage.getItem(hrKey)) || []; } catch(e){ return []; } })().slice().sort((a,b)=> new Date(a.time||0) - new Date(b.time||0));
+      const labels = rows.map(r => new Date(r.time||Date.now()).toLocaleTimeString()); const data = rows.map(r => Number(r.bpm || r.hr || r.value || 0));
+      if(hrChart){ hrChart.destroy(); }
+      hrChart = new Chart(canvas.getContext('2d'), { type: 'line', data: { labels, datasets: [ { label: 'BPM', data, borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.2)', tension:0.35, fill:false, pointRadius:2 } ] }, options: { responsive:true, plugins:{ legend:{ display:true } }, scales: { y:{ beginAtZero:false, suggestedMin:40, suggestedMax:180 } } } });
+    }
+
+    // Insights
+    function classifyBP(sys, dia){ if(!sys || !dia) return {label:'--', level:0}; if(sys >= 180 || dia >= 120) return {label:'Hypertensive Crisis', level:3}; if(sys >= 140 || dia >= 90) return {label:'Stage 2 Hypertension', level:2}; if((sys >= 130 && sys <= 139) || (dia >= 80 && dia <= 89)) return {label:'Stage 1 Hypertension', level:1}; if(sys >= 120 && sys <= 129 && dia < 80) return {label:'Elevated', level:0}; return {label:'Normal', level:0}; }
+    function computeInsights(){
+      const rows = (function(){ try { return JSON.parse(localStorage.getItem(bpKey)) || []; } catch(e){ return []; } })();
+      const now = new Date(); const todayKey = now.toISOString().slice(0,10); let todaySys=0, todayDia=0, todayCnt=0; let weekSys=0, weekDia=0, weekCnt=0; let last = null;
+      rows.forEach(r => { const d = new Date(r.time || Date.now()); const key = d.toISOString().slice(0,10); if(key === todayKey){ todaySys += +r.sys||0; todayDia += +r.dia||0; todayCnt++; } if(d >= new Date(now.getFullYear(), now.getMonth(), now.getDate()-6)){ weekSys += +r.sys||0; weekDia += +r.dia||0; weekCnt++; } if(!last || new Date(last.time) < d) last = r; });
+      const tSys = todayCnt ? Math.round(todaySys/todayCnt) : null; const tDia = todayCnt ? Math.round(todayDia/todayCnt) : null; const wSys = weekCnt ? Math.round(weekSys/weekCnt) : null; const wDia = weekCnt ? Math.round(weekDia/weekCnt) : null;
+      const insToday = document.getElementById('ins-bp-today'); const insClass = document.getElementById('ins-bp-class'); insToday && (insToday.textContent = (tSys && tDia) ? `${tSys}/${tDia}` : '--'); const cls = classifyBP(tSys, tDia); insClass && (insClass.textContent = cls.label);
+      const ins7d = document.getElementById('ins-bp-7d'); ins7d && (ins7d.textContent = (wSys && wDia) ? `${wSys}/${wDia}` : '--');
+      const water = (function(){ try { return JSON.parse(localStorage.getItem(waterKey)) || {}; } catch(e){ return {}; } })();
+      const goal = (prefs && prefs.water_goal) ? prefs.water_goal : 2000; const entriesToday = (water[todayKey] || []); const todayTotal = entriesToday.reduce((a,b)=> a + (b.amount||0), 0); const pct = Math.round((todayTotal/goal)*100);
+      const insPct = document.getElementById('ins-water-pct'); insPct && (insPct.textContent = `${Math.min(100,pct)}% of goal`);
+      let streak=0; for(let i=0;i<30;i++){ const d=new Date(now); d.setDate(now.getDate()-i); const key=d.toISOString().slice(0,10); const tot=(water[key]||[]).reduce((a,b)=> a + (b.amount||0), 0); if(tot >= goal) streak++; else break; }
+      const insStreak = document.getElementById('ins-water-streak'); insStreak && (insStreak.textContent = streak ? `${streak} day streak` : 'No current streak');
+      const alertEl = document.getElementById('alert-banner'); if(alertEl){ if(last){ const c = classifyBP(+last.sys, +last.dia); if(c.level >= 2){ alertEl.style.display = ''; alertEl.textContent = `Recent high reading ${last.sys}/${last.dia} at ${new Date(last.time || Date.now()).toLocaleString()} — ${c.label}. If you feel unwell, seek medical advice.`; } else { alertEl.style.display = 'none'; alertEl.textContent = ''; } } else { alertEl.style.display = 'none'; alertEl.textContent = ''; } }
+    }
+
+    // Snapshot download
+    function downloadSnapshot(){
+      try{
+        const hero = document.querySelector('.hero').cloneNode(true);
+        const grid = document.querySelector('.section.grid').cloneNode(true);
+        const bpc = grid.querySelector('#bp-chart'); const wtc = grid.querySelector('#water-chart'); const stc = grid.querySelector('#steps-chart'); const hrc = grid.querySelector('#hr-chart');
+        if(bpc){ const img = new Image(); img.src = document.getElementById('bp-chart').toDataURL('image/png'); img.style.width='100%'; img.style.height='auto'; bpc.replaceWith(img); }
+        if(wtc){ const img2 = new Image(); img2.src = document.getElementById('water-chart').toDataURL('image/png'); img2.style.width='100%'; img2.style.height='auto'; wtc.replaceWith(img2); }
+        if(stc){ const img3 = new Image(); img3.src = document.getElementById('steps-chart').toDataURL('image/png'); img3.style.width='100%'; img3.style.height='auto'; stc.replaceWith(img3); }
+        if(hrc){ const img4 = new Image(); img4.src = document.getElementById('hr-chart').toDataURL('image/png'); img4.style.width='100%'; img4.style.height='auto'; hrc.replaceWith(img4); }
+        const css = document.querySelector('style').innerHTML;
+        const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1" /><title>MediTrack — Health Monitoring</title><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"><style>${css}</style></head><body><div class="container">${hero.outerHTML}${grid.outerHTML}</div></body></html>`;
+        const blob = new Blob([html], {type:'text/html;charset=utf-8'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'health_monitoring.html'; a.click(); setTimeout(()=> URL.revokeObjectURL(a.href), 1000);
+      }catch(e){ alert('Failed to generate download. Please try printing instead.'); }
+    }
+
+    // CSV exports
+    function exportCSV(filename, rows){ const csv = rows.map(r => r.map(v => { const val = (v ?? '').toString().replace(/\"/g,'""'); return /[",\n]/.test(val) ? `"${val}"` : val; }).join(',')).join('\n'); const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); setTimeout(()=> URL.revokeObjectURL(a.href),1000); }
+    function exportBPCSV(){ const rows = (function(){ try { return JSON.parse(localStorage.getItem(bpKey)) || []; } catch(e){ return []; } })(); const data = [['time','systolic','diastolic','pulse','notes']].concat(rows.map(r => [r.time, r.sys, r.dia, (r.pulse ?? ''), (r.notes ?? '')])); exportCSV('bp_readings.csv', data); }
+    function exportWaterCSV(){ const dataObj = (function(){ try { return JSON.parse(localStorage.getItem(waterKey)) || {}; } catch(e){ return {}; } })(); const rows = [['date','time','amount_ml']]; Object.keys(dataObj).sort().forEach(date => { (dataObj[date]||[]).forEach(e => rows.push([date, e.time, e.amount])); }); exportCSV('hydration.csv', rows); }
+
+    function buildSnapshotHTML(){ try { const hero = document.querySelector('.hero').cloneNode(true); const grid = document.querySelector('.section.grid').cloneNode(true); const bpc = grid.querySelector('#bp-chart'); const wtc = grid.querySelector('#water-chart'); const stc = grid.querySelector('#steps-chart'); const hrc = grid.querySelector('#hr-chart'); if(bpc){ const img = new Image(); img.src = document.getElementById('bp-chart').toDataURL('image/png'); img.style.width='100%'; img.style.height='auto'; bpc.replaceWith(img); } if(wtc){ const img2 = new Image(); img2.src = document.getElementById('water-chart').toDataURL('image/png'); img2.style.width='100%'; img2.style.height='auto'; wtc.replaceWith(img2); } if(stc){ const img3 = new Image(); img3.src = document.getElementById('steps-chart').toDataURL('image/png'); img3.style.width='100%'; img3.style.height='auto'; stc.replaceWith(img3); } if(hrc){ const img4 = new Image(); img4.src = document.getElementById('hr-chart').toDataURL('image/png'); img4.style.width='100%'; img4.style.height='auto'; hrc.replaceWith(img4); } const wrapper = document.createElement('div'); wrapper.appendChild(hero); wrapper.appendChild(grid); return wrapper.innerHTML; } catch(e) { return ''; } }
+
+    // Wire buttons
+    document.getElementById('save-prefs').onclick = () => { const goalInput = document.getElementById('pref-water-goal'); prefs.water_goal = Math.max(500, +goalInput.value || 2000); storage.set(prefsKey, prefs); renderWater(); renderWaterChart(); computeInsights(); };
+    document.getElementById('export-bp').onclick = exportBPCSV;
+    document.getElementById('export-water').onclick = exportWaterCSV;
+    document.getElementById('btn-print').onclick = () => window.print();
+    document.getElementById('btn-download').onclick = downloadSnapshot;
+    const enableNotifBtn = document.getElementById('enable-notif');
+    if(enableNotifBtn){ enableNotifBtn.onclick = async () => { const ok = await requestNotifications(); if(ok){ await scheduleNotifications(); alert('Notifications enabled and reminders scheduled.'); } else { alert('Notifications permission not granted.'); } }; }
+
+    const syncBtn = document.getElementById('btn-sync'); const syncNID = document.getElementById('sync-nid'); const syncEmail = document.getElementById('sync-email'); const syncStatus = document.getElementById('sync-status');
+    if(syncEmail && !syncEmail.value){ syncEmail.value = '{{ request.user.email|default:"" }}'; }
+    if(syncBtn){ syncBtn.onclick = async () => {
+      const nid = (syncNID.value||'').trim(); const email = (syncEmail.value||'').trim(); if(!nid || !email){ syncStatus.textContent = 'Enter National ID and Owner Email to sync.'; return; }
+      syncStatus.textContent = 'Syncing...';
+      const payload = { owner_email: email, prefs: (function(){ try { return JSON.parse(localStorage.getItem(prefsKey)) || {}; } catch(e){ return {}; } })(), meds: (function(){ try { return JSON.parse(localStorage.getItem(medsKey)) || []; } catch(e){ return []; } })(), bp: (function(){ try { return JSON.parse(localStorage.getItem(bpKey)) || []; } catch(e){ return []; } })(), hr: (function(){ try { return JSON.parse(localStorage.getItem(hrKey)) || []; } catch(e){ return []; } })(), steps: (function(){ try { return JSON.parse(localStorage.getItem(stepsKey)) || []; } catch(e){ return []; } })(), water: (function(){ try { return JSON.parse(localStorage.getItem(waterKey)) || {}; } catch(e){ return {}; } })(), habits: (function(){ try { return JSON.parse(localStorage.getItem(habitKey)) || []; } catch(e){ return []; } })(), snapshot_html: buildSnapshotHTML(), };
+      try{ const res = await fetch(`/api/health-sync/${encodeURIComponent(nid)}/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), }); if(res.ok){ syncStatus.textContent = 'Synced successfully. Your clinician can now view it after OTP verification.'; } else { const j = await res.json().catch(()=>({})); syncStatus.textContent = `Failed to sync${j.error? ': '+j.error:''}`; } } catch(err){ syncStatus.textContent = 'Network error while syncing.'; }
+    }; }
+
+    // Initial render
+    renderMeds(); renderBP(); renderWater(); renderHabits(); renderSteps(); renderHR(); scheduleNotifications(); renderBPChart(); renderWaterChart(); renderStepsChart(); renderHRChart(); computeInsights();
+  })();
+  </script>
+</body>
+</html>

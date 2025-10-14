@@ -1,0 +1,104 @@
+{% extends 'medical/profile_create.html' %}
+
+{% block title %}Update {{ profile.full_name }} | MediTrack{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<style>
+    .form-header {
+        background: linear-gradient(135deg, var(--warning) 0%, #f59e0b 100%);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h2>Update Profile: {{ profile.full_name }}</h2>
+    </div>
+    <div class="form-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-section">
+                <h3>Personal Information</h3>
+                <div class="two-columns">
+                    <div class="form-group">
+                        <label for="{{ form.full_name.id_for_label }}">Full Name</label>
+                        {{ form.full_name }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.national_id.id_for_label }}">National ID</label>
+                        {{ form.national_id }}
+                        <small class="text-muted">Cannot be changed after creation</small>
+                    </div>
+                </div>
+                
+                <div class="two-columns">
+                    <div class="form-group">
+                        <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth</label>
+                        {{ form.date_of_birth }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.gender.id_for_label }}">Gender</label>
+                        {{ form.gender }}
+                    </div>
+                </div>
+                
+                <div class="two-columns">
+                    <div class="form-group">
+                        <label for="{{ form.country.id_for_label }}">Country</label>
+                        {{ form.country }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.blood_type.id_for_label }}">Blood Type</label>
+                        {{ form.blood_type }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>Emergency Information</h3>
+                <div class="two-columns">
+                    <div class="form-group">
+                        <label for="{{ form.emergency_contact.id_for_label }}">Emergency Contact Name</label>
+                        {{ form.emergency_contact }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ form.emergency_phone.id_for_label }}">Emergency Phone</label>
+                        {{ form.emergency_phone }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>Medical Information</h3>
+                <div class="form-group">
+                    <label for="{{ form.allergies.id_for_label }}">Allergies</label>
+                    {{ form.allergies }}
+                    <small class="text-muted">List any known allergies, separated by commas.</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.medical_conditions.id_for_label }}">Medical Conditions</label>
+                    {{ form.medical_conditions }}
+                    <small class="text-muted">List any chronic or significant medical conditions.</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.medications.id_for_label }}">Current Medications</label>
+                    {{ form.medications }}
+                    <small class="text-muted">List current medications with dosages if known.</small>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <a href="{% url 'profile_detail' profile.national_id %}" class="btn btn-cancel">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Update Profile
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

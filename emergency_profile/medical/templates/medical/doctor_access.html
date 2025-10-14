@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Doctor Authentication</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .auth-box { 
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h2 { 
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .patient-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        button {
+            background: #4361ee;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #3a56d4;
+        }
+        .error {
+            color: #e74c3c;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-box">
+        <h2>Doctor Authentication</h2>
+        <div class="patient-info">
+            <strong>Patient:</strong> {{ profile.full_name }}<br>
+            <strong>ID:</strong> {{ profile.national_id }}
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <input type="password" name="access_code" placeholder="Enter Access Code" required>
+            {% if error %}
+                <div class="error">{{ error }}</div>
+            {% endif %}
+            <button type="submit">Verify Access</button>
+        </form>
+    </div>
+</body>
+</html>

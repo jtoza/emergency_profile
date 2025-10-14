@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doctor View - {{ profile.full_name }}</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #111827;
+            --muted: #94a3b8;
+            --text: #e5e7eb;
+            --primary: #3b82f6;
+            --accent: #8b5cf6;
+            --danger: #ef4444;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0b1220, #0f172a);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+                Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', Arial,
+                'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+        }
+        .wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        .card {
+            background: rgba(17, 24, 39, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            max-width: 1000px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .header {
+            padding: 24px 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .actions { display: flex; gap: 10px; }
+        .btn { display: inline-block; padding: 10px 14px; border-radius: 10px; font-weight: 700; font-size: 13px; text-decoration: none; }
+        .btn-primary { background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff; }
+        .btn-outline { border: 1px solid rgba(255,255,255,0.25); color: #fff; }
+        .btn:hover { filter: brightness(1.1); }
+        .title { font-size: 20px; font-weight: 700; letter-spacing: .3px; }
+        .badge { background: linear-gradient(135deg, var(--primary), var(--accent)); padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 16px; padding: 24px 28px; }
+        @media (min-width: 900px) { .grid { grid-template-columns: 2fr 1fr; } }
+        .section { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 18px; }
+        .section h3 { margin: 0 0 12px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; }
+        .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+        .value { font-size: 15px; color: var(--text); }
+        .muted { color: var(--muted); font-style: italic; }
+        .qr { display: flex; align-items: center; justify-content: center; padding: 12px; background: #fff; border-radius: 10px; }
+        .qr img { width: 200px; height: 200px; display: block; }
+        .footer { padding: 16px 28px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 12px; color: var(--muted); text-align: right; }
+        .danger { color: var(--danger); }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="card">
+            <div class="header">
+                <div class="title">Doctor Access — Full Patient Details</div>
+                <div class="actions">
+                    <a class="btn btn-outline" href="{% url 'doctor_profile_download' profile.national_id %}">Download</a>
+                    <a class="btn btn-primary" href="{% url 'profile_update' profile.national_id %}?next={% url 'doctor_profile' profile.national_id %}">Edit</a>
+                </div>
+            </div>
+            <div class="grid">
+                <div class="section">
+                    <h3>Personal Information</h3>
+                    <div class="row">
+                        <div>
+                            <div class="label">Full Name</div>
+                            <div class="value">{{ profile.full_name }}</div>
+                        </div>
+                        <div>
+                            <div class="label">National ID</div>
+                            <div class="value">{{ profile.national_id }}</div>
+                        </div>
+                        <div>
+                            <div class="label">Date of Birth</div>
+                            <div class="value">
+                                {% if profile.date_of_birth %}
+                                    {{ profile.date_of_birth|date:"F j, Y" }} {% if profile.get_age %}({{ profile.get_age }} yrs){% endif %}
+                                {% else %}
+                                    <span class="muted">Not specified</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            <div class="label">Gender</div>
+                            <div class="value">{{ profile.get_gender_display }}</div>
+                        </div>
+                        <div>
+                            <div class="label">Country</div>
+                            <div class="value">{{ profile.country }}</div>
+                        </div>
+                        <div>
+                            <div class="label">Blood Type</div>
+                            <div class="value">{% if profile.blood_type %}{{ profile.get_blood_type_display }}{% else %}<span class="muted">Not specified</span>{% endif %}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="section">
+                    <h3>QR Code</h3>
+                    <div class="qr">
+                        {% if qr_data_uri %}
+                            <img src="{{ qr_data_uri }}" alt="QR Code" />
+                        {% elif profile.qr_code %}
+                            <img src="{{ profile.qr_code.url }}" alt="QR Code" />
+                        {% else %}
+                            <span class="muted">No QR code available</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="section">
+                    <h3>Emergency Contacts</h3>
+                    <div class="row">
+                        <div>
+                            <div class="label">Emergency Contact</div>
+                            <div class="value">{{ profile.emergency_contact }}</div>
+                        </div>
+                        <div>
+                            <div class="label">Emergency Phone</div>
+                            <div class="value">{% if profile.emergency_phone %}{{ profile.emergency_phone }}{% else %}<span class="muted">Not specified</span>{% endif %}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="section">
+                    <h3>Medical Details</h3>
+                    <div class="row">
+                        <div>
+                            <div class="label">Allergies</div>
+                            <div class="value">{% if profile.allergies %}{{ profile.allergies|linebreaks }}{% else %}<span class="muted">None reported</span>{% endif %}</div>
+                        </div>
+                        <div>
+                            <div class="label">Conditions</div>
+                            <div class="value">{% if profile.medical_conditions %}{{ profile.medical_conditions|linebreaks }}{% else %}<span class="muted">None reported</span>{% endif %}</div>
+                        </div>
+                        <div>
+                            <div class="label">Medications</div>
+                            <div class="value">{% if profile.medications %}{{ profile.medications|linebreaks }}{% else %}<span class="muted">None reported</span>{% endif %}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="section">
+                    <h3>System</h3>
+                    <div class="row">
+                        <div>
+                            <div class="label">Created</div>
+                            <div class="value">{{ profile.created_at|date:"F j, Y H:i" }}</div>
+                        </div>
+                        <div>
+                            <div class="label">Last Updated</div>
+                            <div class="value">{{ profile.updated_at|date:"F j, Y H:i" }}</div>
+                        </div>
+                        <div>
+                            <div class="label">Access Code</div>
+                            <div class="value danger">Hidden</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                Confidential — For authorized medical personnel only.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,373 @@
+{% extends 'medical/base.html' %}
+
+{% block title %}{{ profile.full_name }} | MediTrack{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-detail-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+    }
+    
+    .profile-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .profile-header::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+        transform: rotate(30deg);
+    }
+    
+    .profile-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2rem;
+        margin: 0;
+        position: relative;
+    }
+    
+    .profile-subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin-top: 0.5rem;
+        position: relative;
+    }
+    
+    .profile-actions {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .action-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .action-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+    }
+    
+    .profile-content {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 2rem;
+    }
+    
+    @media (min-width: 992px) {
+        .profile-content {
+            grid-template-columns: 2fr 1fr;
+        }
+    }
+    
+    .profile-info {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    @media (min-width: 768px) {
+        .profile-info {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    
+    .info-card {
+        background: var(--light);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+    }
+    
+    .info-card h3 {
+        color: var(--primary);
+        margin-top: 0;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+    }
+    
+    .info-item {
+        margin-bottom: 1rem;
+    }
+    
+    .info-label {
+        font-weight: 500;
+        color: var(--muted);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.2rem;
+    }
+    
+    .info-value {
+        color: var(--dark);
+        font-weight: 400;
+    }
+    
+    .empty-value {
+        color: var(--muted);
+        font-style: italic;
+    }
+    
+    .qr-card {
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .qr-container {
+        margin: 0 auto 1.5rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+        display: inline-block;
+    }
+    
+    .qr-container img {
+        width: 180px;
+        height: 180px;
+    }
+    
+    .access-options {
+        margin-top: 1.5rem;
+    }
+    
+    .access-option {
+        background: var(--light);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .access-option h4 {
+        margin-top: 0;
+        color: var(--dark);
+    }
+    
+    .access-option p {
+        color: var(--muted);
+        font-size: 0.9rem;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .badge-primary {
+        background: rgba(67, 97, 238, 0.1);
+        color: var(--primary);
+    }
+    
+    .badge-danger {
+        background: rgba(248, 113, 113, 0.1);
+        color: var(--danger);
+    }
+    
+    .badge-success {
+        background: rgba(74, 222, 128, 0.1);
+        color: var(--success);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-detail-container">
+    <div class="profile-header">
+        <div class="profile-actions">
+            <a href="{% url 'profile_update' profile.national_id %}" class="action-btn" title="Edit">
+                <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'emergency_profile' profile.national_id %}" class="action-btn" title="Emergency View">
+                <i class="fas fa-bolt"></i>
+            </a>
+        </div>
+        <h1 class="profile-title">{{ profile.full_name }}</h1>
+        <p class="profile-subtitle">Medical Profile #{{ profile.national_id }}</p>
+    </div>
+    
+    <div class="profile-content">
+        <div class="profile-info">
+            <div class="info-card">
+                <h3>Personal Information</h3>
+                <div class="info-item">
+                    <div class="info-label">Full Name</div>
+                    <div class="info-value">{{ profile.full_name }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">National ID</div>
+                    <div class="info-value">{{ profile.national_id }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Date of Birth</div>
+                    <div class="info-value">
+                        {% if profile.date_of_birth %}
+                            {{ profile.date_of_birth|date:"F j, Y" }} ({{ profile.get_age }} years)
+                        {% else %}
+                            <span class="empty-value">Not specified</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Gender</div>
+                    <div class="info-value">{{ profile.get_gender_display }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Country</div>
+                    <div class="info-value">{{ profile.country }}</div>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <h3>Emergency Information</h3>
+                <div class="info-item">
+                    <div class="info-label">Emergency Contact</div>
+                    <div class="info-value">{{ profile.emergency_contact }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Emergency Phone</div>
+                    <div class="info-value">
+                        {% if profile.emergency_phone %}
+                            {{ profile.emergency_phone }}
+                        {% else %}
+                            <span class="empty-value">Not specified</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Blood Type</div>
+                    <div class="info-value">
+                        {% if profile.blood_type %}
+                            <span class="badge badge-danger">{{ profile.get_blood_type_display }}</span>
+                        {% else %}
+                            <span class="empty-value">Not specified</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <h3>Medical Information</h3>
+                <div class="info-item">
+                    <div class="info-label">Allergies</div>
+                    <div class="info-value">
+                        {% if profile.allergies %}
+                            {{ profile.allergies|linebreaks }}
+                        {% else %}
+                            <span class="empty-value">None reported</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Medical Conditions</div>
+                    <div class="info-value">
+                        {% if profile.medical_conditions %}
+                            {{ profile.medical_conditions|linebreaks }}
+                        {% else %}
+                            <span class="empty-value">None reported</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Medications</div>
+                    <div class="info-value">
+                        {% if profile.medications %}
+                            {{ profile.medications|linebreaks }}
+                        {% else %}
+                            <span class="empty-value">None reported</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <h3>System Information</h3>
+                <div class="info-item">
+                    <div class="info-label">Created</div>
+                    <div class="info-value">{{ profile.created_at|date:"F j, Y H:i" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Last Updated</div>
+                    <div class="info-value">{{ profile.updated_at|date:"F j, Y H:i" }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Doctor Access Code</div>
+                    <div class="info-value">
+                        <span class="badge badge-primary">{{ profile.doctor_access_code }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div>
+            <div class="qr-card">
+                <h3>Profile QR Code</h3>
+                <div class="qr-container">
+                    <img src="{{ profile.qr_code.url }}" alt="QR Code">
+                </div>
+                <p>Scan this code to access this medical profile</p>
+                
+                <div class="access-options">
+                    <div class="access-option">
+                        <h4>Public Access</h4>
+                        <p>Basic information visible to anyone scanning the QR code.</p>
+                        <a href="{% url 'public_profile' profile.national_id %}" class="btn btn-outline" style="width: 100%; margin-top: 0.5rem;">
+                            View Public Profile
+                        </a>
+                    </div>
+                    
+                    <div class="access-option">
+                        <h4>Emergency Access</h4>
+                        <p>Critical medical information for emergency responders.</p>
+                        <a href="{% url 'emergency_profile' profile.national_id %}" class="btn btn-outline" style="width: 100%; margin-top: 0.5rem;">
+                            View Emergency Profile
+                        </a>
+                    </div>
+                    
+                    <div class="access-option">
+                        <h4>Doctor Access</h4>
+                        <p>Full medical records for healthcare professionals.</p>
+                        <a href="{% url 'doctor_access' profile.national_id %}" class="btn btn-outline" style="width: 100%; margin-top: 0.5rem;">
+                            Request Doctor Access
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

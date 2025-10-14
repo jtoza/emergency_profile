@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Medical Profiles System{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --primary-dark: #3a0ca3;
+            --secondary: #3f37c9;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #2b2d42;
+            --muted: #6c757d;
+            --success: #4ade80;
+            --danger: #f87171;
+            --warning: #fbbf24;
+            --info: #60a5fa;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f9fafb;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 0;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 3rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .footer-links h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: var(--light);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--muted);
+        }
+
+        /* Messages */
+        .messages {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 400px;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            align-items: center;
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        .alert-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .alert-error {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .alert-warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+
+        .alert-info {
+            background-color: var(--info);
+            color: white;
+        }
+
+        .alert i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#4361ee">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" sizes="192x192" href="/static/medical/app-icon-192.svg">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container navbar-container">
+            <a href="{% url 'home' %}" class="logo">
+                <i class="fas fa-heartbeat"></i> MediTrack
+            </a>
+            <div class="nav-links">
+                <a href="{% url 'profile_list' %}">Profiles</a>
+                <a href="{% url 'profile_create' %}">Create Profile</a>
+                <a href="{% url 'about' %}">About</a>
+                <a href="{% url 'health_monitoring' %}">Health</a>
+                <a id="pwa-install-btn" class="btn btn-outline" style="display:none" href="javascript:void(0)">Install App</a>
+                {% if user.is_authenticated %}
+                  <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                  <a href="{% url 'login' %}">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            <i class="fas 
+            {% if message.tags == 'success' %}fa-check-circle{% endif %}
+            {% if message.tags == 'error' %}fa-exclamation-circle{% endif %}
+            {% if message.tags == 'warning' %}fa-exclamation-triangle{% endif %}
+            {% if message.tags == 'info' %}fa-info-circle{% endif %}
+            "></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-container">
+            <div class="footer-about">
+                <a href="#" class="footer-logo">MediTrack</a>
+                <p>Advanced medical profile management system for healthcare professionals and emergency responders.</p>
+            </div>
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="{% url 'profile_list' %}">All Profiles</a></li>
+                    <li><a href="{% url 'profile_create' %}">Create Profile</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h3>Contact</h3>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</li>
+                    <li><i class="fas fa-phone"></i> +254 700 000000</li>
+                    <li><i class="fas fa-envelope"></i> info@meditrack.com</li>
+                </ul>
+            </div>
+        </div>
+        <div class="container copyright">
+            <p>&copy; {% now "Y" %} MediTrack. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Auto-dismiss messages after 5 seconds
+        setTimeout(() => {
+            const messages = document.querySelectorAll('.alert');
+            messages.forEach(msg => {
+                msg.style.animation = 'fadeOut 0.5s ease-out forwards';
+                setTimeout(() => msg.remove(), 500);
+            });
+        }, 5000);
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/service-worker.js').catch(function(err){
+            console.warn('SW registration failed', err);
+          });
+        });
+      }
+    </script>
+    <script>
+      (function(){
+        let deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', function(e){
+          e.preventDefault();
+          deferredPrompt = e;
+          var btn = document.getElementById('pwa-install-btn');
+          if (btn) btn.style.display = 'inline-block';
+        });
+
+        window.addEventListener('appinstalled', function(){
+          var btn = document.getElementById('pwa-install-btn');
+          if (btn) btn.style.display = 'none';
+          deferredPrompt = null;
+        });
+
+        document.addEventListener('click', async function(e){
+          var t = e.target;
+          if (t && t.id === 'pwa-install-btn') {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            try {
+              await deferredPrompt.userChoice;
+            } finally {
+              deferredPrompt = null;
+              t.style.display = 'none';
+            }
+          }
+        });
+      })();
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
