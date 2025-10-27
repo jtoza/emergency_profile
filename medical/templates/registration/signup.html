@@ -1,28 +1,444 @@
 {% extends 'medical/base.html' %}
 {% load widget_tweaks %}
 {% block title %}Sign Up | MediTrack{% endblock %}
+
+{% block extra_css %}
+<style>
+    .signup-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+
+    .signup-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: var(--box-shadow);
+        padding: 3rem 2.5rem;
+        width: 100%;
+        max-width: 500px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .signup-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+    }
+
+    .signup-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .signup-icon {
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 10px 25px rgba(67, 97, 238, 0.3);
+    }
+
+    .signup-icon i {
+        font-size: 2rem;
+        color: white;
+    }
+
+    .signup-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .signup-subtitle {
+        color: var(--muted);
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--dark);
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label i {
+        color: var(--primary);
+        width: 16px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-family: 'Poppins', sans-serif;
+        transition: var(--transition);
+        background-color: #fff;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .form-control:hover {
+        border-color: #cbd5e0;
+    }
+
+    .password-strength {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .password-strength.weak {
+        color: var(--danger);
+    }
+
+    .password-strength.medium {
+        color: var(--warning);
+    }
+
+    .password-strength.strong {
+        color: var(--success);
+    }
+
+    .password-requirements {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        border-left: 3px solid var(--primary-light);
+    }
+
+    .password-requirements h4 {
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        color: var(--dark);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .password-requirements ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .password-requirements li {
+        font-size: 0.8rem;
+        color: var(--muted);
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .password-requirements li.valid {
+        color: var(--success);
+    }
+
+    .password-requirements li i {
+        font-size: 0.7rem;
+    }
+
+    .signup-btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-top: 1rem;
+        font-family: 'Poppins', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .signup-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    }
+
+    .signup-btn:active {
+        transform: translateY(0);
+    }
+
+    .signup-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .signup-footer p {
+        color: var(--muted);
+        margin-bottom: 0.5rem;
+    }
+
+    .signup-footer a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .signup-footer a:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+    }
+
+    .error-message {
+        background-color: rgba(248, 113, 113, 0.1);
+        border: 1px solid var(--danger);
+        color: var(--danger);
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .field-errors {
+        color: var(--danger);
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        display: block;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+        .signup-card {
+            padding: 2rem 1.5rem;
+            margin: 1rem;
+        }
+
+        .signup-title {
+            font-size: 1.8rem;
+        }
+
+        .signup-icon {
+            width: 70px;
+            height: 70px;
+        }
+
+        .signup-icon i {
+            font-size: 1.7rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="max-width:520px;margin:2rem auto;background:#fff;border-radius:12px;box-shadow:var(--box-shadow);padding:2rem;">
-  <h2 style="font-family:'Playfair Display',serif;margin-bottom:1rem;">Create your account</h2>
-  <form method="post" novalidate>
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-    <div style="display:grid;gap:1rem;">
-      <div>
-        <label>Username</label>
-        {{ form.username|add_class:'form-control' }}
-      </div>
-      <div>
-        <label>Password</label>
-        {{ form.password1|add_class:'form-control' }}
-      </div>
-      <div>
-        <label>Confirm Password</label>
-        {{ form.password2|add_class:'form-control' }}
-      </div>
-      <button class="btn btn-primary" type="submit" style="width:100%;">Create account</button>
+<div class="signup-container">
+    <div class="signup-card">
+        <div class="signup-header">
+            <div class="signup-icon">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h1 class="signup-title">Join MediTrack</h1>
+            <p class="signup-subtitle">Create your account to manage medical profiles</p>
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <form method="post" novalidate id="signup-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label" for="{{ form.username.id_for_label }}">
+                    <i class="fas fa-user"></i>Username
+                </label>
+                {{ form.username|add_class:"form-control" }}
+                {% if form.username.errors %}
+                    <span class="field-errors">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.username.errors }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.password1.id_for_label }}">
+                    <i class="fas fa-lock"></i>Password
+                </label>
+                {{ form.password1|add_class:"form-control" }}
+                {% if form.password1.errors %}
+                    <span class="field-errors">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.password1.errors }}
+                    </span>
+                {% endif %}
+                
+                <div class="password-requirements">
+                    <h4><i class="fas fa-info-circle"></i>Password Requirements</h4>
+                    <ul>
+                        <li id="req-length"><i class="fas fa-circle"></i> At least 8 characters</li>
+                        <li id="req-uppercase"><i class="fas fa-circle"></i> One uppercase letter</li>
+                        <li id="req-lowercase"><i class="fas fa-circle"></i> One lowercase letter</li>
+                        <li id="req-number"><i class="fas fa-circle"></i> One number</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.password2.id_for_label }}">
+                    <i class="fas fa-lock"></i>Confirm Password
+                </label>
+                {{ form.password2|add_class:"form-control" }}
+                {% if form.password2.errors %}
+                    <span class="field-errors">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.password2.errors }}
+                    </span>
+                {% endif %}
+                <div id="password-match" class="password-strength" style="display: none;">
+                    <i class="fas fa-check-circle"></i> Passwords match
+                </div>
+            </div>
+
+            <button class="signup-btn" type="submit">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+        </form>
+
+        <div class="signup-footer">
+            <p>Already have an account? <a href="{% url 'login' %}">Sign in here</a></p>
+            <p><a href="#" style="font-size: 0.9rem;">Having trouble signing up?</a></p>
+        </div>
     </div>
-  </form>
-  <p style="margin-top:1rem;color:var(--muted);">Already have an account? <a href="{% url 'login' %}">Login</a></p>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const password1 = document.getElementById('{{ form.password1.id_for_label }}');
+        const password2 = document.getElementById('{{ form.password2.id_for_label }}');
+        const passwordMatch = document.getElementById('password-match');
+        
+        // Password validation indicators
+        const reqLength = document.getElementById('req-length');
+        const reqUppercase = document.getElementById('req-uppercase');
+        const reqLowercase = document.getElementById('req-lowercase');
+        const reqNumber = document.getElementById('req-number');
+        
+        function validatePassword() {
+            const password = password1.value;
+            
+            // Check length
+            if (password.length >= 8) {
+                reqLength.classList.add('valid');
+                reqLength.innerHTML = '<i class="fas fa-check-circle"></i> At least 8 characters';
+            } else {
+                reqLength.classList.remove('valid');
+                reqLength.innerHTML = '<i class="fas fa-circle"></i> At least 8 characters';
+            }
+            
+            // Check uppercase
+            if (/[A-Z]/.test(password)) {
+                reqUppercase.classList.add('valid');
+                reqUppercase.innerHTML = '<i class="fas fa-check-circle"></i> One uppercase letter';
+            } else {
+                reqUppercase.classList.remove('valid');
+                reqUppercase.innerHTML = '<i class="fas fa-circle"></i> One uppercase letter';
+            }
+            
+            // Check lowercase
+            if (/[a-z]/.test(password)) {
+                reqLowercase.classList.add('valid');
+                reqLowercase.innerHTML = '<i class="fas fa-check-circle"></i> One lowercase letter';
+            } else {
+                reqLowercase.classList.remove('valid');
+                reqLowercase.innerHTML = '<i class="fas fa-circle"></i> One lowercase letter';
+            }
+            
+            // Check number
+            if (/[0-9]/.test(password)) {
+                reqNumber.classList.add('valid');
+                reqNumber.innerHTML = '<i class="fas fa-check-circle"></i> One number';
+            } else {
+                reqNumber.classList.remove('valid');
+                reqNumber.innerHTML = '<i class="fas fa-circle"></i> One number';
+            }
+        }
+        
+        function checkPasswordMatch() {
+            if (password1.value && password2.value) {
+                if (password1.value === password2.value) {
+                    passwordMatch.style.display = 'flex';
+                    passwordMatch.className = 'password-strength strong';
+                    passwordMatch.innerHTML = '<i class="fas fa-check-circle"></i> Passwords match';
+                } else {
+                    passwordMatch.style.display = 'flex';
+                    passwordMatch.className = 'password-strength weak';
+                    passwordMatch.innerHTML = '<i class="fas fa-times-circle"></i> Passwords do not match';
+                }
+            } else {
+                passwordMatch.style.display = 'none';
+            }
+        }
+        
+        if (password1) {
+            password1.addEventListener('input', validatePassword);
+            password1.addEventListener('input', checkPasswordMatch);
+        }
+        
+        if (password2) {
+            password2.addEventListener('input', checkPasswordMatch);
+        }
+    });
+</script>
 {% endblock %}

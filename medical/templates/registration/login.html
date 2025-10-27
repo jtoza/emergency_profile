@@ -1,25 +1,258 @@
 {% extends 'medical/base.html' %}
 {% load widget_tweaks %}
 {% block title %}Login | MediTrack{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+
+    .login-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 3rem 2.5rem;
+        width: 100%;
+        max-width: 440px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .login-icon {
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 10px 25px rgba(67, 97, 238, 0.3);
+    }
+
+    .login-icon i {
+        font-size: 2rem;
+        color: white;
+    }
+
+    .login-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .login-subtitle {
+        color: var(--muted);
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--dark);
+        font-size: 0.95rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        font-family: 'Poppins', sans-serif;
+        transition: var(--transition);
+        background-color: #fff;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .form-control:hover {
+        border-color: #cbd5e0;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-top: 0.5rem;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    }
+
+    .login-btn:active {
+        transform: translateY(0);
+    }
+
+    .login-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .login-footer p {
+        color: var(--muted);
+        margin-bottom: 0.5rem;
+    }
+
+    .login-footer a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .login-footer a:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+    }
+
+    .error-message {
+        background-color: rgba(248, 113, 113, 0.1);
+        border: 1px solid var(--danger);
+        color: var(--danger);
+        padding: 0.75rem 1rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+    }
+
+    .field-errors {
+        color: var(--danger);
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+        .login-card {
+            padding: 2rem 1.5rem;
+            margin: 1rem;
+        }
+
+        .login-title {
+            font-size: 1.8rem;
+        }
+
+        .login-icon {
+            width: 70px;
+            height: 70px;
+        }
+
+        .login-icon i {
+            font-size: 1.7rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="max-width:480px;margin:2rem auto;background:#fff;border-radius:12px;box-shadow:var(--box-shadow);padding:2rem;">
-  <h2 style="font-family:'Playfair Display',serif;margin-bottom:1rem;">Welcome back</h2>
-  <form method="post" novalidate>
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-    <div style="display:grid;gap:1rem;">
-      <div>
-        <label>Username</label>
-        {{ form.username|add_class:'form-control' }}
-      </div>
-      <div>
-        <label>Password</label>
-        {{ form.password|add_class:'form-control' }}
-      </div>
-      {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
-      <button class="btn btn-primary" type="submit" style="width:100%;">Login</button>
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-icon">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <h1 class="login-title">Welcome Back</h1>
+            <p class="login-subtitle">Sign in to access your medical profiles</p>
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label" for="{{ form.username.id_for_label }}">
+                    <i class="fas fa-user" style="margin-right: 8px;"></i>Username
+                </label>
+                {{ form.username|add_class:"form-control" }}
+                {% if form.username.errors %}
+                    <span class="field-errors">{{ form.username.errors }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.password.id_for_label }}">
+                    <i class="fas fa-lock" style="margin-right: 8px;"></i>Password
+                </label>
+                {{ form.password|add_class:"form-control" }}
+                {% if form.password.errors %}
+                    <span class="field-errors">{{ form.password.errors }}</span>
+                {% endif %}
+            </div>
+
+            {% if next %}
+                <input type="hidden" name="next" value="{{ next }}" />
+            {% endif %}
+
+            <button class="login-btn" type="submit">
+                <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>Sign In
+            </button>
+        </form>
+
+        <div class="login-footer">
+            <p>Don't have an account? <a href="{% url 'signup' %}">Create one here</a></p>
+            <p><a href="#" style="font-size: 0.9rem;">Forgot your password?</a></p>
+        </div>
     </div>
-  </form>
-  <p style="margin-top:1rem;color:var(--muted);">No account? <a href="{% url 'signup' %}">Sign up</a></p>
 </div>
 {% endblock %}
